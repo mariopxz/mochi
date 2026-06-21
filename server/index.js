@@ -11,6 +11,13 @@ app.use(express.json());
 // Rutas
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
+const linksRoutes = require('./routes/links');
+app.use('/links', linksRoutes);
+
+const authMiddleware = require('./middleware/auth');
+app.get('/protected', authMiddleware, (req, res) => {
+  res.json({ message: `Hola ${req.user.username}, estás autenticado` });
+});
 
 // Test conexión DB
 const db = require('./db/connection');
