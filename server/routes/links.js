@@ -123,31 +123,4 @@ router.post('/:id/click', async (req, res) => {
   }
 })
 
-// GET /links/u/:username -- Obtener todos los links de un usuario
-router.get('/u/:username', async (req, res) => {
-  const { username } = req.params;
-
-  try {
-    const [users] = await db.query(
-      'SELECT id, username, bio, avatar FROM users WHERE username = ?',
-      [username]
-    );
-
-    if (users.length === 0) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
-    }
-
-    const user = users[0];
-
-    const [links] = await db.query(
-      'SELECT * FROM links WHERE user_id = ? ORDER BY position ASC',
-      [user.id]
-    );
-    
-    res.json({ user, links });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-})
-
 module.exports = router;
