@@ -10,9 +10,11 @@ app.use(express.json());
 
 // Rutas
 const authRoutes = require('./routes/auth');
-app.use('/auth', authRoutes);
 const linksRoutes = require('./routes/links');
+const profileRoutes = require('./routes/profile');
+app.use('/auth', authRoutes);
 app.use('/links', linksRoutes);
+app.use('/', profileRoutes);
 
 const authMiddleware = require('./middleware/auth');
 app.get('/protected', authMiddleware, (req, res) => {
