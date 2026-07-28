@@ -26,6 +26,6 @@ export const reorderLinks = (links) => api.put('/links/reorder', { links });
 export const clickLink = (id) => api.post(`/links/${id}/click`);
 
 // Perfil público
-export const getProfile = (username) => api.get(`/links/u/${username}`);
+export const getProfile = (username) => api.get(`/u/${username}`);
 
 export default api;

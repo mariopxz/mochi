@@ -8,7 +8,7 @@ const authMiddleware = require('../middleware/auth');
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const [links] = await db.query(
-      'SELECT * FROM links WHERE user_id = ?',
+      'SELECT * FROM links WHERE user_id = ? ORDER BY position ASC',
       [req.user.id]
     );
     res.json(links);

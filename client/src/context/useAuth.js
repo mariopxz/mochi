@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./authContext";
 
 // Hook para usar el contexto facilmente
 export function useAuth() {
