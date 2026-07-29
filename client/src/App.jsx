@@ -4,6 +4,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import Profile from './pages/Profile';
+import Home from './pages/Home';
 
 function App() {
   return (
@@ -24,6 +26,12 @@ function App() {
             <Dashboard />
           </ProtectedRoute>
         } />
+        <Route path="/" element={
+          <PublicRoute>
+            <Home />
+          </PublicRoute>
+        } />
+        <Route path="/:username" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   )

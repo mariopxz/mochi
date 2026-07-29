@@ -96,6 +96,9 @@ export default function SortableLinkItem({
             >
               {link.url}
             </a>
+            <p className="mt-2 text-xs text-slate-200">
+              {link.clicks ?? 0} {(link.clicks ?? 0) === 1 ? "clic" : "clics"}
+            </p>
           </div>
 
           <div className="flex shrink-0 gap-1 text-sm">
