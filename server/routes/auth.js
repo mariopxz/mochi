@@ -81,4 +81,20 @@ router.post('/login', async (req, res) => {
   }
 })
 
+// PUT /auth/profile
+router.put('/profile', authMiddleware, async (req, res) => {
+  const { bio } = req.body;
+
+  try {
+    await db.query(
+      'UPDATE users SET bio = ? WHERE id = ?',
+      [bio, req.user.id]
+    );
+
+    res.json({ message: 'Perfil actualizado' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
+
 module.exports = router;

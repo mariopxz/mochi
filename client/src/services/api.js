@@ -27,5 +27,6 @@ export const clickLink = (id) => api.post(`/links/${id}/click`);
 
 // Perfil público
 export const getProfile = (username) => api.get(`/u/${username}`);
+export const updateProfile = (data) => api.put('/auth/profile', data);
 
 export default api;
