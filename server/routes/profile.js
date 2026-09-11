@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const db = require('../db/connection');
+const authMiddleware = require('../middleware/auth');
 
 const RESERVED = ['health', 'auth', 'links', 'dashboard', 'login', 'register']
 
@@ -15,7 +16,7 @@ router.get('/u/:username', async (req, res) => {
 
   try {
     const [users] = await db.query(
-      'SELECT id, username, bio, avatar FROM users WHERE username = ?',
+      'SELECT id, name, username, bio, avatar FROM users WHERE username = ?',
       [username]
     );
 
@@ -31,6 +32,21 @@ router.get('/u/:username', async (req, res) => {
     );
     
     res.json({ user, links });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
+
+// PUT /auth/profile -- Actualizar el perfil del usuario
+router.put('/profile', authMiddleware, async (req, res) => {
+  const { name, username, bio, avatar } = req.body;
+
+  try {
+    const [result] = await db.query(
+      'UPDATE users SET name = ?, username = ?, bio = ?, avatar = ? WHERE id = ?',
+      [name, username, bio, avatar, req.user.id]
+    );
+    res.json({ message: 'Perfil actualizado correctamente' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

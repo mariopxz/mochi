@@ -82,20 +82,23 @@ router.post('/login', async (req, res) => {
   }
 })
 
-// PUT /auth/profile
-router.put('/profile', authMiddleware, async (req, res) => {
-  const { bio } = req.body;
 
+// GET /auth/me
+router.get('/me', authMiddleware, async (req, res) => {
   try {
-    await db.query(
-      'UPDATE users SET bio = ? WHERE id = ?',
-      [bio, req.user.id]
-    );
+    const [userData] = await db.query(
+      'SELECT name, username, email, avatar, bio FROM users WHERE id = ?',
+      [req.user.id]
+    )
 
-    res.json({ message: 'Perfil actualizado' });
+    if (userData.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    res.json(userData[0]);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message })
   }
-})
+});
 
 module.exports = router;

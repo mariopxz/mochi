@@ -49,3 +49,8 @@ lerna-debug.log*
 # ==================
 .DS_Store
 *.local
+
+# ==================
+# API Tests
+# ==================
+api-tests

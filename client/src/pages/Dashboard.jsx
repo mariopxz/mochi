@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   closestCenter,
@@ -14,7 +14,14 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { createLink, deleteLink, getLinks, reorderLinks, updateLink } from "../services/api";
+import {
+  createLink,
+  deleteLink,
+  getLinks,
+  reorderLinks,
+  updateLink,
+  getMe,
+} from "../services/api";
 import SortableLinkItem from "../components/SortableLinkItem";
 import { useAuth } from "../context/useAuth";
 
@@ -34,6 +41,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [userData, setUserData] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -47,10 +57,15 @@ export default function Dashboard() {
   );
 
   useEffect(() => {
-    const loadLinks = async () => {
+    const loadUserData = async () => {
       try {
-        const { data } = await getLinks();
-        setLinks(data);
+        const [{ data: userData }, { data: links }] = await Promise.all([
+          getMe(),
+          getLinks(),
+        ]);
+
+        setUserData(userData);
+        setLinks(links);
       } catch (err) {
         setError(
           err.response?.data?.message || "No se pudieron cargar tus links.",
@@ -60,12 +75,27 @@ export default function Dashboard() {
       }
     };
 
-    loadLinks();
+    loadUserData();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  const handleMenuClick = () => {
+    setMenuOpen(!menuOpen);
   };
 
   const handleCreate = async (event) => {
@@ -149,7 +179,7 @@ export default function Dashboard() {
     setError("");
 
     try {
-      const linksWithPositions = updatedLinks.map((link, position) =>({
+      const linksWithPositions = updatedLinks.map((link, position) => ({
         id: link.id,
         position,
       }));
@@ -158,7 +188,10 @@ export default function Dashboard() {
     } catch (err) {
       // Si la base de datos no se actualiza, volvemos al orden anterior.
       setLinks(previousLinks);
-      setError(err.response?.data?.message || "No se pudo guardar el nuevo orden de los links.")
+      setError(
+        err.response?.data?.message ||
+          "No se pudo guardar el nuevo orden de los links.",
+      );
     }
   };
 
@@ -184,19 +217,78 @@ export default function Dashboard() {
               Gestiona los links de tu perfil
             </p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
-          >
-            Cerrar sesión
-          </button>
+          <div className="flex items-center gap-3 relative">
+            <button
+              type="button"
+              onClick={handleMenuClick}
+              className="flex  flex-row items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:cursor-pointer"
+            >
+              {userData?.avatar ? (
+                <img
+                  src={userData?.avatar}
+                  alt="avatar"
+                  className="h-10 w-10 rounded-full"
+                />
+              ) : (
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-xl text-white">
+                  {user?.username?.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </button>
+            
+            <div ref={menuRef} className={`absolute top-0 right-0 mt-2 rounded-lg border border-slate-200 bg-white p-3 shadow-lg transition-all duration-200 
+              ${menuOpen 
+              ? "opacity-100 scale-100" 
+              : "opacity-0 scale-95 pointer-events-none"}`}>
+            <div className={`flex flex-col gap-3 w-60 transition-all duration-200 ${menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}>
+              <div className="flex flex-row items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-600">
+                <div className="flex flex-col items-start">
+                  <p className="text-sm text-slate-500">{userData?.name}</p>
+                  <p className="text-xs text-slate-400">{userData?.email}</p>
+                </div>
+
+                {userData?.avatar ? (
+                  <img
+                    src={userData?.avatar}
+                    alt="avatar"
+                    className="h-10 w-10 rounded-full"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-xl text-white">
+                    {user?.username?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <hr className="border-slate-200" />
+              <button
+                className={`flex flex-row items-center gap-2 text-left rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:cursor-pointer transition-all duration-400 ${menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+              >
+                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#45556c"><path d="M5 20V19C5 15.134 8.13401 12 12 12V12C15.866 12 19 15.134 19 19V20" stroke="#45556c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="#45556c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                Account settings
+              </button>
+              <button
+                className={`flex flex-row items-center gap-2 text-left rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:cursor-pointer transition-all duration-600 ${menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+              >
+                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#45556c"><path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="#45556c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 18.01L12.01 17.9989" stroke="#45556c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.8214 2.48697 15.5291 3.33782 17L2.5 21.5L7 20.6622C8.47087 21.513 10.1786 22 12 22Z" stroke="#45556c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                Help center
+              </button>
+              <button
+                onClick={handleLogout}
+                className={`flex flex-row items-center gap-2 text-left rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:cursor-pointer transition-all duration-800 ${menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+              >
+                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#45556c"><path d="M12 12H19M19 12L16 15M19 12L16 9" stroke="#45556c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19 6V5C19 3.89543 18.1046 3 17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V18" stroke="#45556c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
         </div>
       </header>
 
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section>
           <div className="mb-6">
-            <h1 className="text-2xl font-bold">Hola, {user?.username} 👋</h1>
+            <h1 className="text-2xl font-bold">Hola, {userData?.name} 👋</h1>
             <p className="mt-1 text-sm text-slate-500">
               Añade, edita y organiza los enlaces que compartirás.
             </p>
@@ -285,7 +377,7 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <aside className="lg:sticky lg:top-6 lg:self-start">
+        <aside className="lg:top-6 lg:self-start">
           <p className="mb-3 text-sm font-medium text-slate-500">
             VISTA PREVIA
           </p>

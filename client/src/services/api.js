@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL,
 })
 
 // Interceptor - añade el token automáticamente a cada petición
@@ -28,5 +28,6 @@ export const clickLink = (id) => api.post(`/links/${id}/click`);
 // Perfil público
 export const getProfile = (username) => api.get(`/u/${username}`);
 export const updateProfile = (data) => api.put('/auth/profile', data);
+export const getMe = () => api.get(`/auth/me`);
 
 export default api;
