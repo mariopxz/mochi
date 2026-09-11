@@ -37,19 +37,4 @@ router.get('/u/:username', async (req, res) => {
   }
 })
 
-// PUT /auth/profile -- Actualizar el perfil del usuario
-router.put('/profile', authMiddleware, async (req, res) => {
-  const { name, username, bio, avatar } = req.body;
-
-  try {
-    const [result] = await db.query(
-      'UPDATE users SET name = ?, username = ?, bio = ?, avatar = ? WHERE id = ?',
-      [name, username, bio, avatar, req.user.id]
-    );
-    res.json({ message: 'Perfil actualizado correctamente' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-})
-
 module.exports = router;
