@@ -6,6 +6,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
 import Profile from './pages/Profile';
 import Home from './pages/Home';
+import Account from './pages/Account';
+import Help from './pages/Help';
 
 function App() {
   return (
@@ -24,6 +26,16 @@ function App() {
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/account" element={
+          <ProtectedRoute>
+            <Account />
+          </ProtectedRoute>
+        } />
+        <Route path="/help" element={
+          <ProtectedRoute>
+            <Help />
           </ProtectedRoute>
         } />
         <Route path="/" element={
