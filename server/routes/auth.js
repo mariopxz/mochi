@@ -125,12 +125,12 @@ router.put('/profile', authMiddleware, async (req, res) => {
   try {
     // Verificiar si el username ya existe
     const [existingUsername] = await db.query(
-      'SELECT id FROM users WHERE username = ?',
-      [sanitizedInputs.username]
+      'SELECT id FROM users WHERE username = ? AND id != ?',
+      [sanitizedInputs.username, req.user.id]
     );
 
     if (existingUsername.length > 0) {
-      return res.status(400).json({ message: 'El username ya está en uso' });
+      return res.status(409).json({ message: 'El username ya está en uso' });
     }
 
     const [result] = await db.query(

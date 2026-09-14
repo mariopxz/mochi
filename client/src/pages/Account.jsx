@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getMe, updateProfile } from "../services/api";
 import { useAuth } from "../context/useAuth";
+import AvatarUploader from "../components/AvatarUploader";
 
 export default function Account() {
   const { user, logout } = useAuth();
@@ -399,20 +400,14 @@ export default function Account() {
               URL del avatar
             </label>
 
-            <input
-              id="avatar"
-              name="avatar"
-              type="url"
-              value={profileForm.avatar}
-              onChange={handleProfileChange}
-              placeholder="https://ejemplo.com/mi-avatar.jpg"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            <AvatarUploader 
+              onUpload={(avatarUrl) =>
+                setProfileForm((current) => ({
+                  ...current,
+                  avatar: avatarUrl,}
+                ))
+              }
             />
-
-            <p className="mt-2 text-xs text-slate-400">
-              De momento puedes pegar una URL de imagen. Más adelante
-              sustituiremos este campo por subida directa a Cloudinary.
-            </p>
           </div>
 
           <div className="mt-7 flex justify-end border-t border-slate-100 pt-5">
