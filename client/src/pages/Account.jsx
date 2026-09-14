@@ -330,7 +330,7 @@ export default function Account() {
                 type="text"
                 value={profileForm.name}
                 onChange={handleProfileChange}
-                placeholder="Mario López"
+                placeholder="Nombre completo o alias"
                 required
                 className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
               />
@@ -355,7 +355,7 @@ export default function Account() {
                   type="text"
                   value={profileForm.username}
                   onChange={handleProfileChange}
-                  placeholder="mariopxz"
+                  placeholder="username"
                   required
                   className="min-w-0 flex-1 px-3 py-2.5 text-sm outline-none"
                 />

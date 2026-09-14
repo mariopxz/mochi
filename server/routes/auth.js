@@ -8,7 +8,7 @@ const authMiddleware = require('../middleware/auth');
 
 // POST /auth/register
 router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const {name, username, email, password } = req.body;
 
   try {
     // Verificiar si el email ya existe
@@ -26,8 +26,8 @@ router.post('/register', async (req, res) => {
 
     // Insertar usuario
     const [result] = await db.query(
-      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-      [username, email, hashedPassword]
+      'INSERT INTO users (name, username, email, password) VALUES (?, ?, ?, ?)',
+      [name, username, email, hashedPassword]
     );
 
     // Generar JWT

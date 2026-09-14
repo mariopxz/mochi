@@ -204,15 +204,12 @@ export default function Dashboard() {
   };
 
   const previewLinks = links.map((link) => (
-    <a
+    <div
       key={link.id}
-      href={link.url}
-      target="_blank"
-      rel="noreferrer"
       className="block w-full rounded-xl bg-white px-4 py-3 text-center text-sm font-medium text-slate-800 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow"
     >
       {link.title}
-    </a>
+    </div>
   ));
 
   return (
@@ -478,10 +475,8 @@ export default function Dashboard() {
           <div className="rounded-[2rem] bg-gradient-to-b from-indigo-100 to-violet-50 p-3 shadow-xl ring-8 ring-slate-800">
             <div className="min-h-[540px] rounded-[1.5rem] bg-slate-50 px-5 py-12">
               <div className="mb-8 text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-600 text-2xl text-white">
-                  {user?.username?.[0]?.toUpperCase() || "M"}
-                </div>
-                <p className="mt-3 font-semibold">@{user?.username}</p>
+                <img src={userData?.avatar} alt={userData?.name} className="mx-auto flex h-16 w-16 items-center justify-center rounded-full" />
+                <p className="mt-3 font-semibold">@{userData?.username}</p>
                 <p className="mt-1 text-xs text-slate-500">
                   Tus links, en un solo lugar.
                 </p>
