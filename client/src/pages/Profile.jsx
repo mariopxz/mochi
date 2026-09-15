@@ -9,12 +9,14 @@ export default function Profile() {
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [reservedRoute, setReservedRoute] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const loadProfile = async () => {
       setLoading(true);
       setNotFound(false);
+      setReservedRoute(false);
       setError("");
 
       try {
@@ -23,8 +25,10 @@ export default function Profile() {
         setUser(data.user);
         setLinks(data.links);
       } catch (err) {
-        if (err.response?.status === 404) {
+        if (err.response?.data?.code === 'USER-NOT-FOUND') {
           setNotFound(true);
+        } else if (err.response?.data?.code === 'ROUTE-RESERVED') {
+          setReservedRoute(true);
         } else {
           setError(err.response?.data?.message || "No se pudo cargar el perfil.");
         }
@@ -58,6 +62,22 @@ export default function Profile() {
           </h1>
           <p className="mt-2 text-sm text-slate-500">
             El perfil @{username} no existe o ya no está disponible.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  if (reservedRoute) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+        <div className="max-w-sm text-center">
+          <p className="text-5xl">🍡</p>
+          <h1 className="mt-4 text-2xl font-bold text-slate-900">
+            Ruta reservada
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            La ruta {username} no está disponible.
           </p>
         </div>
       </main>

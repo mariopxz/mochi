@@ -4,6 +4,7 @@ import { register } from "../services/api";
 import { useAuth } from "../context/useAuth";
 
 export default function Register() {
+  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +20,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const { data } = await register({ username, email, password });
+      const { data } = await register({ name, username, email, password });
       saveLogin(data.token, data.username);
       navigate("/dashboard");
     } catch (err) {
@@ -49,17 +50,42 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Username
+              Nombre
             </label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="mariopxz"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nombre"
               required
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
+
+          <div>
+              <label
+                htmlFor="username"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Username
+              </label>
+
+              <div className="flex overflow-hidden rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-indigo-500">
+                <span className="bg-slate-50 px-3 py-2.5 text-sm text-slate-400">
+                  @
+                </span>
+
+                <input
+                  name="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="username"
+                  required
+                  className="min-w-0 flex-1 px-3 py-2.5 text-sm outline-none"
+                />
+              </div>
+            </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -83,7 +109,7 @@ export default function Register() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="••••••••••••"
               required
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
