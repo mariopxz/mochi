@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../services/api';
-import { useAuth } from '../context/useAuth';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/api";
+import { useAuth } from "../context/useAuth";
+import AuthLayout from "../components/AuthLayout";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,78 +21,86 @@ export default function Login() {
     try {
       const { data } = await login({ email, password });
       saveLogin(data.token, data.username);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+      setError(err.response?.data?.message || "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 w-full max-w-md p-8">
-        
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-indigo-600">mochi 🍡</h1>
-          <p className="text-gray-500 mt-2">Inicia sesión en tu cuenta</p>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="bg-red-50 text-red-600 text-sm rounded-lg p-3 mb-6">
-            {error}
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
-              required
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl py-3 text-sm transition-colors disabled:opacity-50"
+    <AuthLayout
+      title="Qué alegría verte otra vez."
+      description="Inicia sesión y sigue construyendo tu espacio en internet."
+      footer={
+        <p className="text-center text-sm text-slate-500">
+          ¿Aún no tienes cuenta?{" "}
+          <Link
+            to="/register"
+            className="font-semibold text-indigo-600 hover:underline"
           >
-            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-          </button>
-        </form>
-
-        {/* Register link */}
-        <p className="text-center text-sm text-gray-500 mt-6">
-          ¿No tienes cuenta?{' '}
-          <Link to="/register" className="text-indigo-600 font-medium hover:underline">
-            Regístrate
+            Crea tu perfil gratis
           </Link>
         </p>
-      </div>
-    </div>
-  )
+      }
+    >
+      {error && (
+        <div
+          role="alert"
+          className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label
+            htmlFor="email"
+            className="mb-2 block text-sm font-medium text-slate-700"
+          >
+            Email
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="tu@email.com"
+            required
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="password"
+            className="mb-2 block text-sm font-medium text-slate-700"
+          >
+            Contraseña
+          </label>
+
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="••••••••"
+            required
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-100 transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? "Iniciando sesión..." : "Entrar en Mochi"}
+        </button>
+      </form>
+    </AuthLayout>
+  );
 }
