@@ -57,7 +57,7 @@ export default function Help() {
               Gestiona los links de tu perfil
             </p>
           </Link>
-          <div className="flex items-center gap-3 relative">
+          <div className={`flex items-center gap-3 relative ${user ? "" : "hidden"}`}>
             <button
               type="button"
               onClick={handleMenuClick}

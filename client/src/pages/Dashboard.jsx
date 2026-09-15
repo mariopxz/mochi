@@ -475,13 +475,24 @@ export default function Dashboard() {
           <div className="rounded-[2rem] bg-gradient-to-b from-indigo-100 to-violet-50 p-3 shadow-xl ring-8 ring-slate-800">
             <div className="min-h-[540px] rounded-[1.5rem] bg-slate-50 px-5 py-12">
               <div className="mb-8 text-center">
-                <img src={userData?.avatar} alt={userData?.name} className="mx-auto flex h-16 w-16 items-center justify-center rounded-full" />
+                {userData?.avatar ? (
+                  <img
+                    src={userData?.avatar}
+                    alt={userData?.name}
+                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-full"
+                  />
+                ) : (
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-600 text-xl text-white">
+                    {userData?.username?.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <p className="mt-3 font-semibold">@{userData?.username}</p>
-                <p className="mt-1 text-xs text-slate-500">
-                  Tus links, en un solo lugar.
-                </p>
+                <p className="mt-1 text-xs text-slate-500">{userData?.bio}</p>
               </div>
               <div className="space-y-3">{previewLinks}</div>
+              <p className="mt-4 text-xs text-center text-slate-500">
+                Hecho con mochi 🍡
+              </p>
             </div>
           </div>
         </aside>
