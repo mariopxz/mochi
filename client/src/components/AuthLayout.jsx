@@ -1,11 +1,26 @@
 import { Link } from "react-router-dom";
+import ProfilePreview from "./ProfilePreview";
 
-export default function AuthLayout({
-  title,
-  description,
-  children,
-  footer,
-}) {
+const demoProfile = {
+  name: "Clara Soler",
+  username: "clarasoler",
+  bio: "Diseñadora digital y amante de las ideas que conectan personas. ✦",
+  avatar:
+    "https://i.pinimg.com/736x/62/81/86/6281868b01a8ae0ce4c91643b11aa0be.jpg",
+  links: [
+    {
+      title: "Mi portfolio",
+    },
+    {
+      title: "Último proyecto — Nébula Studio",
+    },
+    {
+      title: "Instagram",
+    },
+  ],
+};
+
+export default function AuthLayout({ title, description, children, footer }) {
   return (
     <main className="min-h-screen bg-white">
       <div className="grid min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.95fr)]">
@@ -37,9 +52,7 @@ export default function AuthLayout({
             <div className="mt-7">{footer}</div>
           </div>
 
-          <p className="text-xs text-slate-400">
-            © 2026 mochi 🍡
-          </p>
+          <p className="text-xs text-slate-400">© 2026 mochi 🍡</p>
         </section>
 
         <aside className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 lg:block">
@@ -48,57 +61,25 @@ export default function AuthLayout({
 
           <div className="relative flex h-full items-center justify-center p-12">
             <div className="relative w-full max-w-sm">
-              <div className="absolute -left-10 top-16 rounded-2xl bg-white p-4 shadow-xl">
+              <div className="absolute z-10 -left-10 top-16 rounded-2xl bg-white p-4 shadow-xl">
                 <p className="text-xs font-medium text-slate-500">
                   Tu URL personal
                 </p>
 
                 <p className="mt-1 text-sm font-bold text-indigo-600">
-                  mochi/marioreiares
+                  mochi/{demoProfile.username}
                 </p>
               </div>
 
-              <div className="relative rounded-[2.5rem] border-[9px] border-slate-900 bg-slate-900 p-2 shadow-2xl">
-                <div className="absolute left-1/2 top-0 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-slate-900" />
+              <div className="rounded-[2.5rem] border-[9px] border-slate-900 bg-slate-900 p-2 shadow-2xl">
+                <div className="absolute left-1/2 top-0 z-10 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-slate-900" />
 
-                <div className="min-h-[510px] rounded-[2rem] bg-gradient-to-b from-violet-100 via-indigo-50 to-white px-6 py-14">
-                  <div className="text-center">
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-indigo-600 text-3xl font-bold text-white ring-4 ring-white">
-                      M
-                    </div>
-
-                    <p className="mt-4 text-lg font-bold text-slate-900">
-                      Mario Reiares
-                    </p>
-
-                    <p className="mt-1 text-sm text-slate-500">
-                      @marioreiares
-                    </p>
-                  </div>
-
-                  <div className="mt-9 space-y-3">
-                    <div className="rounded-xl bg-white px-4 py-3 text-center text-sm font-medium text-slate-800 shadow-sm ring-1 ring-slate-200">
-                      Mi portfolio
-                    </div>
-
-                    <div className="rounded-xl bg-white px-4 py-3 text-center text-sm font-medium text-slate-800 shadow-sm ring-1 ring-slate-200">
-                      LinkedIn
-                    </div>
-
-                    <div className="rounded-xl bg-white px-4 py-3 text-center text-sm font-medium text-slate-800 shadow-sm ring-1 ring-slate-200">
-                      Último proyecto
-                    </div>
-                  </div>
-
-                  <p className="mt-10 text-center text-xs text-slate-400">
-                    Hecho con mochi 🍡
-                  </p>
-                </div>
+                <ProfilePreview profile={demoProfile} links={demoProfile.links} />
               </div>
 
               <div className="absolute -bottom-7 -right-8 rounded-2xl bg-white p-4 shadow-xl">
                 <p className="text-xs font-medium text-slate-500">
-                  Links compartidos
+                  Comparte todo desde
                 </p>
 
                 <p className="mt-1 text-2xl font-bold text-indigo-600">

@@ -24,11 +24,45 @@ import {
 } from "../services/api";
 import SortableLinkItem from "../components/SortableLinkItem";
 import { useAuth } from "../context/useAuth";
+import ProfilePreview from "../components/ProfilePreview";
 
 const emptyLink = { title: "", url: "" };
 
-function normaliseUrl(url) {
-  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+function normaliseUrl(raw) {
+  if (typeof raw !== "string") {
+    throw new Error("La URL debe ser un string");
+  }
+
+  const url = raw.trim();
+
+  // Si el usuario deja el input vacío, lo consideramos inválido
+  if (!url) {
+    throw new Error("La URL está vacía");
+  }
+
+  // Añadimos https:// si no tiene protocolo
+  const withProtocol = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+
+  let parsed;
+  try {
+    parsed = new URL(withProtocol);
+  } catch (e) {
+    // Si new URL falla, la URL no es válida
+    throw new Error("La URL no es válida");
+  }
+
+  // Aseguramos protocolo http/https
+  if (!["http:", "https:"].includes(parsed.protocol)) {
+    throw new Error("Solo se permiten URLs http o https");
+  }
+
+  // Aseguramos que tenga hostname (dominio o IP)
+  if (!parsed.hostname) {
+    throw new Error("La URL debe tener un dominio");
+  }
+
+  // Devuelve la URL normalizada (con https:// si hacía falta)
+  return parsed.toString();
 }
 
 export default function Dashboard() {
@@ -203,15 +237,6 @@ export default function Dashboard() {
     }
   };
 
-  const previewLinks = links.map((link) => (
-    <div
-      key={link.id}
-      className="block w-full rounded-xl bg-white px-4 py-3 text-center text-sm font-medium text-slate-800 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow"
-    >
-      {link.title}
-    </div>
-  ));
-
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
@@ -247,7 +272,7 @@ export default function Dashboard() {
 
             <div
               ref={menuRef}
-              className={`absolute top-0 right-0 mt-2 rounded-lg border border-slate-200 bg-white p-3 shadow-lg transition-all duration-200 
+              className={`absolute z-10 top-0 right-0 mt-2 rounded-lg border border-slate-200 bg-white p-3 shadow-lg transition-all duration-200 
               ${
                 menuOpen
                   ? "opacity-100 scale-100"
@@ -472,28 +497,11 @@ export default function Dashboard() {
           <p className="mb-3 text-sm font-medium text-slate-500">
             VISTA PREVIA
           </p>
-          <div className="rounded-[2rem] bg-gradient-to-b from-indigo-100 to-violet-50 p-3 shadow-xl ring-8 ring-slate-800">
-            <div className="min-h-[540px] rounded-[1.5rem] bg-slate-50 px-5 py-12">
-              <div className="mb-8 text-center">
-                {userData?.avatar ? (
-                  <img
-                    src={userData?.avatar}
-                    alt={userData?.name}
-                    className="mx-auto flex h-16 w-16 items-center justify-center rounded-full"
-                  />
-                ) : (
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-600 text-xl text-white">
-                    {userData?.username?.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <p className="mt-3 font-semibold">@{userData?.username}</p>
-                <p className="mt-1 text-xs text-slate-500">{userData?.bio}</p>
-              </div>
-              <div className="space-y-3">{previewLinks}</div>
-              <p className="mt-4 text-xs text-center text-slate-500">
-                Hecho con mochi 🍡
-              </p>
-            </div>
+          <div className="rounded-4xl bg-slate-900 p-3 shadow-xl ring-8 ring-slate-800">
+            <ProfilePreview
+              profile={userData || { username: user?.username }}
+              links={links}
+            />
           </div>
         </aside>
       </div>

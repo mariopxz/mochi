@@ -30,4 +30,8 @@ export const getProfile = (username) => api.get(`/u/${username}`);
 export const updateProfile = (data) => api.put('/auth/profile', data);
 export const getMe = () => api.get(`/auth/me`);
 
+// Perfil privado
+export const updatePassword = (data) => api.put('/auth/password', data);
+export const updateEmail = (data) => api.put('/auth/email', data);
+
 export default api;

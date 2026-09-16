@@ -143,4 +143,74 @@ router.put('/profile', authMiddleware, async (req, res) => {
   }
 })
 
+// PUT /auth/password -- Actualizar la contraseña del usuario
+router.put('/password', authMiddleware, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const sanitizedInputs = {
+    oldPassword: oldPassword.trim(),
+    newPassword: newPassword.trim()
+  };
+
+  try {
+    // Verificar contraseña actual
+    const [users] = await db.query(
+      'SELECT password FROM users WHERE id = ?',
+      [req.user.id]
+    );
+
+    const user = users[0];
+
+    const validPassword = await bcrypt.compare(sanitizedInputs.oldPassword, user.password);
+
+    if (!validPassword) {
+      return res.status(400).json({ message: 'La contraseña actual es incorrecta' });
+    }
+
+    if (sanitizedInputs.newPassword.length < 8) {
+      return res.status(400).json({ message: 'La contraseña debe tener al menos 8 caracteres' });
+    }
+
+    // Hashear la contraseña
+    const hashedPassword = await bcrypt.hash(sanitizedInputs.newPassword, 10);
+
+    // Actualizar contraseña
+    const [result] = await db.query(
+      'UPDATE users SET password = ? WHERE id = ?',
+      [hashedPassword, req.user.id]
+    );
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
+
+// PUT /auth/email -- Actualizar el email del usuario
+router.put('/email', authMiddleware, async (req, res) => {
+  const { newEmail } = req.body;
+  const sanitizedInputs = {
+    newEmail: removeAllSpaces(newEmail)
+  };
+
+  try {
+    // Verificar si el email ya existe
+    const [existingEmail] = await db.query(
+      'SELECT id FROM users WHERE email = ?',
+      [sanitizedInputs.newEmail]
+    );
+
+    if (existingEmail.length > 0) {
+      return res.status(409).json({ message: 'El email ya está en uso' });
+    }
+
+    const [result] = await db.query(
+      'UPDATE users SET email = ? WHERE id = ?',
+      [sanitizedInputs.newEmail, req.user.id]
+    );
+    res.json({ message: 'Correo electrónico actualizado correctamente' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
+
 module.exports = router;

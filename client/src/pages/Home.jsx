@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import ProfilePreview from "../components/ProfilePreview";
 
 const features = [
   {
@@ -21,6 +22,25 @@ const features = [
       "Consulta qué links interesan más a las personas que visitan tu perfil.",
   },
 ];
+
+const demoProfile = {
+  name: "Clara Soler",
+  username: "clarasoler",
+  bio: "Diseñadora digital y amante de las ideas que conectan personas. ✦",
+  avatar:
+    "https://i.pinimg.com/736x/62/81/86/6281868b01a8ae0ce4c91643b11aa0be.jpg",
+  links: [
+    {
+      title: "Mi portfolio",
+    },
+    {
+      title: "Último proyecto — Nébula Studio",
+    },
+    {
+      title: "Instagram",
+    },
+  ],
+};
 
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -136,44 +156,10 @@ export default function Home() {
             <div className="relative mx-auto rounded-[2.7rem] border-[9px] border-slate-900 bg-slate-900 p-2 shadow-2xl shadow-indigo-200">
               <div className="absolute left-1/2 top-0 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-slate-900" />
 
-              <div className="min-h-[540px] rounded-[2rem] bg-gradient-to-b from-violet-100 via-indigo-50 to-white px-5 py-12">
-                <div className="text-center">
-                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-3xl font-bold text-white shadow-lg ring-4 ring-white">
-                    M
-                  </div>
-
-                  <p className="mt-4 text-lg font-bold text-slate-900">
-                    Mario Reiares
-                  </p>
-
-                  <p className="mt-1 text-sm text-slate-500">@marioreiares</p>
-
-                  <p className="mt-4 text-sm leading-6 text-slate-600">
-                    Desarrollo proyectos y comparto lo que voy aprendiendo. ✨
-                  </p>
-                </div>
-
-                <div className="mt-8 space-y-3">
-                  <div className="rounded-xl bg-white px-4 py-3.5 text-center text-sm font-medium text-slate-800 shadow-sm ring-1 ring-slate-200">
-                    Mi portfolio
-                  </div>
-
-                  <div className="rounded-xl bg-white px-4 py-3.5 text-center text-sm font-medium text-slate-800 shadow-sm ring-1 ring-slate-200">
-                    LinkedIn
-                  </div>
-
-                  <div className="rounded-xl bg-white px-4 py-3.5 text-center text-sm font-medium text-slate-800 shadow-sm ring-1 ring-slate-200">
-                    Último proyecto
-                  </div>
-                </div>
-
-                <p className="mt-8 text-center text-xs text-slate-400">
-                  Hecho con mochi 🍡
-                </p>
-              </div>
+              <ProfilePreview profile={demoProfile} links={demoProfile.links} />
             </div>
 
-            <div className="relative -mt-16 -ml-8 w-fit rounded-2xl border border-indigo-100 bg-white p-4 shadow-xl">
+            <div className="relative -mt-16 -ml-2 w-fit rounded-2xl border border-indigo-100 bg-white p-4 shadow-xl md:-ml-14">
               <p className="text-xs font-medium text-slate-500">
                 Tus links están creciendo
               </p>

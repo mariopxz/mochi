@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getMe, updateProfile } from "../services/api";
+import { getMe, updateProfile, updatePassword, updateEmail } from "../services/api";
 import { useAuth } from "../context/useAuth";
 import AvatarUploader from "../components/AvatarUploader";
 
@@ -10,6 +10,13 @@ export default function Account() {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: "",
+    newPassword: "",
+  });
+  const [emailForm, setEmailForm] = useState({
+    newEmail: "",
+  });
 
   const [profileForm, setProfileForm] = useState({
     name: "",
@@ -68,6 +75,52 @@ export default function Account() {
       ...current,
       [name]: value,
     }));
+  };
+
+  const handlePasswordChange = async () => {
+    setSaving(true);
+    setMessage("");
+    setError("");
+
+    try {
+      await updatePassword(passwordForm);
+
+      setPasswordForm({
+        oldPassword: "",
+        newPassword: "",
+      });
+
+      setMessage("Contraseña actualizada correctamente.");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "No se pudo actualizar la contraseña.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEmailChange = async () => {
+    setSaving(true);
+    setMessage("");
+    setError("");
+
+    try {
+      await updateEmail(emailForm);
+
+      setEmailForm({
+        newEmail: "",
+      });
+
+      setMessage("Correo electrónico actualizado correctamente.");
+      setUserData((current) => ({ ...current, email: emailForm.newEmail }));
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "No se pudo actualizar el correo electrónico.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleProfileSubmit = async (event) => {
@@ -393,19 +446,12 @@ export default function Account() {
           </div>
 
           <div className="mt-5">
-            <label
-              htmlFor="avatar"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              URL del avatar
-            </label>
-
-            <AvatarUploader 
+            <AvatarUploader
               onUpload={(avatarUrl) =>
                 setProfileForm((current) => ({
                   ...current,
-                  avatar: avatarUrl,}
-                ))
+                  avatar: avatarUrl,
+                }))
               }
             />
           </div>
@@ -414,7 +460,7 @@ export default function Account() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
             >
               {saving ? "Guardando..." : "Guardar cambios"}
             </button>
@@ -438,25 +484,26 @@ export default function Account() {
 
               <input
                 type="email"
+                value={emailForm.newEmail}
+                onChange={(event) =>
+                  setEmailForm((current) => ({
+                    ...current,
+                    newEmail: event.target.value,
+                  }))
+                }
                 placeholder="nuevo@email.com"
-                disabled
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-400"
               />
             </div>
 
             <button
               type="button"
-              disabled
-              className="rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-400"
+              onClick={handleEmailChange}
+              className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
             >
               Cambiar correo
             </button>
           </div>
-
-          <p className="mt-3 text-xs text-slate-400">
-            Disponible cuando creemos el endpoint seguro para actualizar el
-            email.
-          </p>
         </section>
 
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
@@ -469,30 +516,40 @@ export default function Account() {
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <input
               type="password"
+              value={passwordForm.oldPassword}
+              onChange={(event) =>
+                setPasswordForm((current) => ({
+                  ...current,
+                  oldPassword: event.target.value,
+                }))
+              }
               placeholder="Contraseña actual"
-              disabled
               className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-400"
             />
 
             <input
               type="password"
+              value={passwordForm.newPassword}
+              onChange={(event) =>
+                setPasswordForm((current) => ({
+                  ...current,
+                  newPassword: event.target.value,
+                }))
+              }
               placeholder="Nueva contraseña"
-              disabled
               className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-400"
             />
           </div>
 
-          <button
-            type="button"
-            disabled
-            className="mt-4 rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-400"
-          >
-            Actualizar contraseña
-          </button>
-
-          <p className="mt-3 text-xs text-slate-400">
-            Disponible cuando creemos el endpoint para cambiar contraseña.
-          </p>
+          <div className="mt-1 flex justify-end pt-5">
+            <button
+              type="button"
+              onClick={handlePasswordChange}
+              className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
+            >
+              Actualizar contraseña
+            </button>
+          </div>
         </section>
       </div>
     </main>
