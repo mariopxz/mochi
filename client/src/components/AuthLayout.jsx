@@ -1,24 +1,6 @@
 import { Link } from "react-router-dom";
 import ProfilePreview from "./ProfilePreview";
-
-const demoProfile = {
-  name: "Clara Soler",
-  username: "clarasoler",
-  bio: "Diseñadora digital y amante de las ideas que conectan personas. ✦",
-  avatar:
-    "https://i.pinimg.com/736x/62/81/86/6281868b01a8ae0ce4c91643b11aa0be.jpg",
-  links: [
-    {
-      title: "Mi portfolio",
-    },
-    {
-      title: "Último proyecto — Nébula Studio",
-    },
-    {
-      title: "Instagram",
-    },
-  ],
-};
+import { demoProfile } from "../constants/demoProfile";
 
 export default function AuthLayout({ title, description, children, footer }) {
   return (

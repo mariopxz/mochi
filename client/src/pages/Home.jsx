@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProfilePreview from "../components/ProfilePreview";
+import { demoProfile } from "../constants/demoProfile";
 
 const features = [
   {
@@ -22,25 +23,6 @@ const features = [
       "Consulta qué links interesan más a las personas que visitan tu perfil.",
   },
 ];
-
-const demoProfile = {
-  name: "Clara Soler",
-  username: "clarasoler",
-  bio: "Diseñadora digital y amante de las ideas que conectan personas. ✦",
-  avatar:
-    "https://i.pinimg.com/736x/62/81/86/6281868b01a8ae0ce4c91643b11aa0be.jpg",
-  links: [
-    {
-      title: "Mi portfolio",
-    },
-    {
-      title: "Último proyecto — Nébula Studio",
-    },
-    {
-      title: "Instagram",
-    },
-  ],
-};
 
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -129,7 +111,7 @@ export default function Home() {
 
                 <button
                   type="submit"
-                  className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 hover:cursor-pointer"
                 >
                   Crear perfil gratis
                 </button>
@@ -148,7 +130,7 @@ export default function Home() {
             </div>
 
             <p className="mt-4 text-xs text-slate-500">
-              Sin tarjeta. Crea tu perfil en unos minutos.
+              Sin ningúna suscripción. Crea tu perfil en unos minutos.
             </p>
           </div>
 
