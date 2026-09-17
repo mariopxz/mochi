@@ -34,7 +34,7 @@ export default function AuthLayout({ title, description, children, footer }) {
             <div className="mt-7">{footer}</div>
           </div>
 
-          <p className="text-xs text-slate-400">© 2026 mochi 🍡</p>
+          <p className="text-xs text-slate-400">© {new Date().getFullYear()}</p>
         </section>
 
         <aside className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 lg:block">
@@ -43,13 +43,13 @@ export default function AuthLayout({ title, description, children, footer }) {
 
           <div className="relative flex h-full items-center justify-center p-12">
             <div className="relative w-full max-w-sm">
-              <div className="absolute z-10 -left-10 top-16 rounded-2xl bg-white p-4 shadow-xl">
+              <div className="absolute z-10 -left-25 top-16 rounded-2xl bg-white p-4 shadow-xl">
                 <p className="text-xs font-medium text-slate-500">
                   Tu URL personal
                 </p>
 
                 <p className="mt-1 text-sm font-bold text-indigo-600">
-                  mochi/{demoProfile.username}
+                  mochiapp.es/{demoProfile.username}
                 </p>
               </div>
 
@@ -59,7 +59,7 @@ export default function AuthLayout({ title, description, children, footer }) {
                 <ProfilePreview profile={demoProfile} links={demoProfile.links} />
               </div>
 
-              <div className="absolute -bottom-7 -right-8 rounded-2xl bg-white p-4 shadow-xl">
+              <div className="absolute -bottom-7 -right-10 rounded-2xl bg-white p-4 shadow-xl">
                 <p className="text-xs font-medium text-slate-500">
                   Comparte todo desde
                 </p>

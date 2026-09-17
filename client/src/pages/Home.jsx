@@ -96,7 +96,7 @@ export default function Home() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl bg-white">
                   <span className="flex items-center bg-indigo-50 px-3 text-sm font-medium text-indigo-500">
-                    mochi/
+                    mochiapp.es/
                   </span>
 
                   <input
