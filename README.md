@@ -251,15 +251,6 @@ También quedan como siguientes mejoras naturales:
 - Añadir validación de esquemas en las entradas de la API.
 - Configurar una estrategia de despliegue y variables por entorno.
 
-## Contribuir
-
-1. Crea una rama descriptiva desde `dev`.
-2. Instala las dependencias de `client` y `server` con pnpm.
-3. Configura los archivos `.env` localmente.
-4. Mantén los cambios centrados en una funcionalidad.
-5. Ejecuta `pnpm lint` y `pnpm build` en `client` antes de abrir una propuesta.
-6. Describe en el cambio qué problema resuelve y cómo probarlo.
-
 ## Licencia
 
 El proyecto todavía no define una licencia pública. Consulta con el propietario antes de reutilizarlo fuera de este repositorio.
