@@ -159,7 +159,7 @@ export default function Account() {
             <p className="text-xl font-bold text-indigo-600">mochi 🍡</p>
 
             <p className="text-sm text-slate-500">
-              Gestiona los links de tu perfil
+              Gestiona los enlaces de tu perfil
             </p>
           </Link>
           <div className="flex items-center gap-3 relative">
@@ -240,7 +240,7 @@ export default function Account() {
                       stroke-linejoin="round"
                     ></path>
                   </svg>
-                  Account settings
+                  Ajustes de cuenta
                 </Link>
                 <Link
                   to="/help"
@@ -277,7 +277,7 @@ export default function Account() {
                       stroke-linejoin="round"
                     ></path>
                   </svg>
-                  Help center
+                  Centro de ayuda
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -316,7 +316,7 @@ export default function Account() {
       <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
         <div className="mb-8">
           <p className="text-sm font-medium text-indigo-600">
-            ACCOUNT SETTINGS
+            AJUSTES DE CUENTA
           </p>
 
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
@@ -395,7 +395,7 @@ export default function Account() {
                 htmlFor="username"
                 className="mb-2 block text-sm font-medium text-slate-700"
               >
-                Username
+                Nombre de usuario
               </label>
 
               <div className="flex overflow-hidden rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-indigo-500">
@@ -409,14 +409,14 @@ export default function Account() {
                   type="text"
                   value={profileForm.username}
                   onChange={handleProfileChange}
-                  placeholder="username"
+                  placeholder="nombre-de-usuario"
                   required
                   className="min-w-0 flex-1 px-3 py-2.5 text-sm outline-none"
                 />
               </div>
 
               <p className="mt-2 text-xs text-slate-400">
-                Tu perfil será: /{profileForm.username || "username"}
+                Tu perfil será: /{profileForm.username || "nombre-de-usuario"}
               </p>
             </div>
           </div>

@@ -84,7 +84,7 @@ export default function Register() {
             htmlFor="username"
             className="mb-2 block text-sm font-medium text-slate-700"
           >
-            Elige tu username
+            Elige tu nombre de usuario
           </label>
 
           <div className="flex overflow-hidden rounded-xl border border-slate-200 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100">
@@ -98,14 +98,14 @@ export default function Register() {
               type="text"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
-              placeholder="tu-username"
+              placeholder="nombre-de-usuario"
               required
               className="min-w-0 flex-1 px-3 py-3 text-sm outline-none"
             />
           </div>
 
           <p className="mt-2 text-xs text-slate-400">
-            Tu perfil será mochi/{username || "tu-username"}
+            Tu perfil será mochi/{username || "nombre-de-usuario"}
           </p>
         </div>
 

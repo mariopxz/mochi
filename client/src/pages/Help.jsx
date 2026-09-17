@@ -54,7 +54,7 @@ export default function Help() {
             <p className="text-xl font-bold text-indigo-600">mochi 🍡</p>
 
             <p className="text-sm text-slate-500">
-              Gestiona los links de tu perfil
+              Gestiona los enlaces de tu perfil
             </p>
           </Link>
           <div className={`flex items-center gap-3 relative ${user ? "" : "hidden"}`}>
@@ -135,7 +135,7 @@ export default function Help() {
                       stroke-linejoin="round"
                     ></path>
                   </svg>
-                  Account settings
+                  Ajustes de cuenta
                 </Link>
                 <Link
                   to="/help"
@@ -172,7 +172,7 @@ export default function Help() {
                       stroke-linejoin="round"
                     ></path>
                   </svg>
-                  Help center
+                  Centro de ayuda
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -221,7 +221,7 @@ export default function Help() {
 
           <form
             onSubmit={(event) => event.preventDefault()}
-            className="mt-7 flex gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm"
+            className="hidden mt-7 flex gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm"
           >
             <input
               type="search"
@@ -276,7 +276,7 @@ export default function Help() {
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Actualiza tu nombre, biografía, avatar y username.
+                Actualiza tu nombre, biografía, avatar y nombre de usuario.
               </p>
             </button>
 
@@ -293,7 +293,7 @@ export default function Help() {
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Consulta cuántas veces han abierto cada uno de tus links.
+                Consulta cuántas veces han abierto cada uno de tus enlaces.
               </p>
             </button>
           </div>
@@ -321,7 +321,7 @@ export default function Help() {
                 <p className="border-t border-slate-100 px-4 py-4 text-sm leading-6 text-slate-500">
                   Tu perfil público está disponible en una URL como{" "}
                   <span className="font-medium text-indigo-600">
-                    mochi.com/tu-username
+                    mochiapp.es/nombre-de-usuario
                   </span>
                   . Copia esa dirección y compártela donde quieras.
                 </p>
@@ -329,7 +329,7 @@ export default function Help() {
 
               <details className="group rounded-xl border border-slate-200 bg-white shadow-sm">
                 <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-4 text-sm font-medium text-slate-700">
-                  ¿Puedo cambiar mi username?
+                  ¿Puedo cambiar mi nombre de usuario?
                   <span className="text-lg text-slate-400 transition group-open:rotate-90">
                     ›
                   </span>
@@ -338,7 +338,7 @@ export default function Help() {
                 <p className="border-t border-slate-100 px-4 py-4 text-sm leading-6 text-slate-500">
                   Sí. Ve a{" "}
                   <span className="font-medium text-slate-700">
-                    Account settings
+                    Ajustes de cuenta
                   </span>{" "}
                   desde el menú de tu avatar. Recuerda que al cambiarlo también
                   cambiará la URL de tu perfil público.
@@ -355,7 +355,7 @@ export default function Help() {
 
                 <p className="border-t border-slate-100 px-4 py-4 text-sm leading-6 text-slate-500">
                   Si todavía no has añadido una imagen, Mochi mostrará la
-                  primera letra de tu username como avatar. Puedes subir o
+                  primera letra de tu nombre de usuario como avatar. Puedes subir o
                   cambiar tu foto desde los ajustes de tu cuenta.
                 </p>
               </details>
@@ -375,6 +375,7 @@ export default function Help() {
 
             <button
               type="button"
+              disabled
               className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-indigo-700 transition hover:bg-indigo-50"
             >
               Contactar con soporte

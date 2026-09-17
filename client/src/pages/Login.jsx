@@ -34,15 +34,26 @@ export default function Login() {
       title="Qué alegría verte otra vez."
       description="Inicia sesión y sigue construyendo tu espacio en internet."
       footer={
-        <p className="text-center text-sm text-slate-500">
-          ¿Aún no tienes cuenta?{" "}
-          <Link
-            to="/register"
-            className="font-semibold text-indigo-600 hover:underline"
-          >
-            Crea tu perfil gratis
-          </Link>
-        </p>
+        <div className="space-y-3 text-center text-sm text-slate-500">
+          <p>
+            ¿Has olvidado tu contraseña?{" "}
+            <Link
+              to="/forgot-password"
+              className="font-semibold text-indigo-600 hover:underline"
+            >
+              Recupera el acceso
+            </Link>
+          </p>
+          <p>
+            ¿Aún no tienes cuenta?{" "}
+            <Link
+              to="/register"
+              className="font-semibold text-indigo-600 hover:underline"
+            >
+              Crea tu perfil gratis
+            </Link>
+          </p>
+        </div>
       }
     >
       {error && (

@@ -46,9 +46,9 @@ function normaliseUrl(raw) {
   let parsed;
   try {
     parsed = new URL(withProtocol);
-  } catch (e) {
+  } catch (error) {
     // Si new URL falla, la URL no es válida
-    throw new Error("La URL no es válida");
+    throw new Error("La URL no es válida", { cause: error });
   }
 
   // Aseguramos protocolo http/https
@@ -248,7 +248,7 @@ export default function Dashboard() {
             <p className="text-xl font-bold text-indigo-600">mochi 🍡</p>
 
             <p className="text-sm text-slate-500">
-              Gestiona los links de tu perfil
+              Gestiona los enlaces de tu perfil
             </p>
           </Link>
           <div className="flex items-center gap-3 relative">
@@ -328,7 +328,7 @@ export default function Dashboard() {
                       stroke-linejoin="round"
                     ></path>
                   </svg>
-                  Account settings
+                  Ajustes de cuenta
                 </button>
                 <button
                   onClick={handleHelpCenter}
@@ -364,7 +364,7 @@ export default function Dashboard() {
                       stroke-linejoin="round"
                     ></path>
                   </svg>
-                  Help center
+                  Centro de ayuda
                 </button>
                 <button
                   onClick={handleLogout}
@@ -423,7 +423,7 @@ export default function Dashboard() {
             onSubmit={handleCreate}
             className="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
           >
-            <h2 className="font-semibold">Añadir un link</h2>
+            <h2 className="font-semibold">Añadir un enlace</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <input
                 value={newLink.title}
@@ -449,17 +449,17 @@ export default function Dashboard() {
               disabled={submitting}
               className="mt-4 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {submitting ? "Guardando..." : "Añadir link"}
+              {submitting ? "Guardando..." : "Añadir enlace"}
             </button>
           </form>
 
           <div className="space-y-3">
-            <h2 className="font-semibold">Tus links ({links.length})</h2>
+            <h2 className="font-semibold">Tus enlaces ({links.length})</h2>
             {loading ? (
-              <p className="text-sm text-slate-500">Cargando links...</p>
+              <p className="text-sm text-slate-500">Cargando enlaces...</p>
             ) : links.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
-                Aún no tienes links. Añade el primero arriba.
+                Aún no tienes enlaces. Añade el primero arriba.
               </div>
             ) : (
               <DndContext

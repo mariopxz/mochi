@@ -6,7 +6,7 @@ import { demoProfile } from "../constants/demoProfile";
 const features = [
   {
     icon: "🔗",
-    title: "Todos tus links",
+    title: "Todos tus enlaces",
     description:
       "Comparte tu portfolio, redes, proyectos y cualquier enlace desde una sola URL.",
   },
@@ -14,13 +14,13 @@ const features = [
     icon: "↕️",
     title: "Ordénalos a tu manera",
     description:
-      "Arrastra y suelta tus links para decidir qué debe ver primero tu audiencia.",
+      "Arrastra y suelta tus enlaces para decidir qué debe ver primero tu audiencia.",
   },
   {
     icon: "📊",
     title: "Entiende tus clics",
     description:
-      "Consulta qué links interesan más a las personas que visitan tu perfil.",
+      "Consulta qué enlaces interesan más a las personas que visitan tu perfil.",
   },
 ];
 
@@ -76,7 +76,7 @@ export default function Home() {
             </div>
 
             <h1 className="mt-6 text-5xl font-bold tracking-tight text-slate-950 sm:text-6xl lg:text-7xl">
-              Todos tus links.
+              Todos tus enlaces.
               <span className="block text-indigo-600">Un solo lugar.</span>
             </h1>
 
@@ -141,9 +141,9 @@ export default function Home() {
               <ProfilePreview profile={demoProfile} links={demoProfile.links} />
             </div>
 
-            <div className="relative -mt-16 -ml-2 w-fit rounded-2xl border border-indigo-100 bg-white p-4 shadow-xl md:-ml-14">
+            <div className="relative -mt-8 -ml-2 w-fit rounded-2xl border border-indigo-100 bg-white p-4 shadow-xl md:-ml-18 md:-mt-16">
               <p className="text-xs font-medium text-slate-500">
-                Tus links están creciendo
+                Tus enlaces están creciendo
               </p>
 
               <div className="mt-2 flex items-end gap-1">
@@ -167,7 +167,7 @@ export default function Home() {
 
           <div className="text-center">
             <p className="text-2xl font-bold text-indigo-600">
-              Links ilimitados
+              Enlaces ilimitados
             </p>
             <p className="mt-1 text-sm text-slate-500">
               organiza lo que importa
@@ -243,14 +243,14 @@ export default function Home() {
               <h3 className="mt-5 text-lg font-semibold">Crea tu cuenta</h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-400">
-                Elige tu username y consigue una URL personal para compartir.
+                Elige tu nombre de usuario y consigue una URL personal para compartir.
               </p>
             </article>
 
             <article className="rounded-2xl border border-slate-700 bg-slate-800 p-6">
               <p className="text-sm font-semibold text-indigo-300">02</p>
 
-              <h3 className="mt-5 text-lg font-semibold">Añade tus links</h3>
+              <h3 className="mt-5 text-lg font-semibold">Añade tus enlaces</h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 Incluye tus redes, trabajo, contenido o cualquier enlace que

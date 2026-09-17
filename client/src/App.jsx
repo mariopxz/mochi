@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import Home from './pages/Home';
 import Account from './pages/Account';
 import Help from './pages/Help';
+import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
   return (
@@ -21,6 +22,11 @@ function App() {
         <Route path="/register" element={
           <PublicRoute>
             <Register />
+          </PublicRoute>
+        } />
+        <Route path="/forgot-password" element={
+          <PublicRoute>
+            <ForgotPassword />
           </PublicRoute>
         } />
         <Route path="/dashboard" element={

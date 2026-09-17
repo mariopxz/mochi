@@ -5,6 +5,7 @@ const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
 export default function AvatarUploader({ onUpload }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedFileName, setSelectedFileName] = useState("");
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -51,7 +52,9 @@ export default function AvatarUploader({ onUpload }) {
       }
 
       onUpload(data.secure_url);
+      setSelectedFileName(file.name);
     } catch (err) {
+      setSelectedFileName("");
       setError(err.message || "No se pudo subir la imagen");
     } finally {
       setUploading(false);
@@ -74,8 +77,21 @@ export default function AvatarUploader({ onUpload }) {
           accept="image/jpeg,image/png,image/webp"
           onChange={handleFileChange}
           disabled={uploading}
-          className="block w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-indigo-700 hover:file:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
+          className="sr-only"
         />
+        <label
+          htmlFor="avatar-file"
+          className={`flex w-full items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 ${
+            uploading ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+          }`}
+        >
+          <span className="mr-4 rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100">
+            Seleccionar imagen
+          </span>
+          <span className="min-w-0 truncate text-slate-500">
+            {selectedFileName || "Ninguna imagen seleccionada"}
+          </span>
+        </label>
 
         <p className="mt-2 text-xs text-slate-400">
           JPG, PNG o WebP. Máximo 2 MB.

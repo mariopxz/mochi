@@ -1,5 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { SquarePen, Trash } from 'lucide-react';
 
 export default function SortableLinkItem({
   link,
@@ -59,21 +60,21 @@ export default function SortableLinkItem({
             <div className="flex gap-2">
               <button 
                 disabled={submitting}
-                className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
               >
                 {submitting ? 'Guardando...' : 'Guardar'}
               </button>
               <button
                 type="button"
                 onClick={onCancel}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:cursor-pointer"
               >
                 Cancelar
               </button>
             </div>
         </form>
       ) : (
-        <div className="flex items-start gap-3">
+        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3">
           <button
             ref={setActivatorNodeRef}
             type="button"
@@ -101,20 +102,20 @@ export default function SortableLinkItem({
             </p>
           </div>
 
-          <div className="flex shrink-0 gap-1 text-sm">
+          <div className="flex min-w-0 shrink-0 gap-1 text-sm">
             <button
               type="button"
               onClick={() => onStartEditing(link)}
-              className="rounded-lg px-2 py-1.5 text-slate-600 hover:bg-slate-100"
+              className="rounded-lg px-1 py-1.5 text-slate-600 md:px-2 md:py-1.5 hover:bg-slate-100 hover:cursor-pointer"
             >
-              Editar
+              <SquarePen className="h-4 w-4" />
             </button>
             <button
               type="button"
               onClick={() => onDelete(link.id)}
-              className="rounded-lg px-2 py-1.5 text-red-600 hover:bg-red-50"
+              className="rounded-lg px-1 py-1.5 text-red-600 md:px-2 md:py-1.5 hover:bg-red-50 hover:cursor-pointer"
             >
-              Borrar
+              <Trash className="h-4 w-4" />
             </button>
         </div>
       </div>
