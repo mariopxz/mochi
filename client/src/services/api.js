@@ -16,6 +16,8 @@ api.interceptors.request.use((config) => {
 // Auth
 export const register = (data) => api.post('/auth/register', data);
 export const login = (data) => api.post('/auth/login', data);
+export const requestPasswordReset = (email) => api.post('/auth/forgot-password', { email });
+export const resetPassword = (data) => api.post('/auth/reset-password', data);
 
 // Links
 export const getLinks = () => api.get('/links');

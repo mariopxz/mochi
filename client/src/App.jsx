@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import Account from './pages/Account';
 import Help from './pages/Help';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -27,6 +28,11 @@ function App() {
         <Route path="/forgot-password" element={
           <PublicRoute>
             <ForgotPassword />
+          </PublicRoute>
+        } />
+        <Route path="/reset-password" element={
+          <PublicRoute>
+            <ResetPassword />
           </PublicRoute>
         } />
         <Route path="/dashboard" element={
