@@ -32,7 +32,12 @@ app.get('/health', async (req, res) => {
     await db.query('SELECT 1');
     res.json({ status: 'ok', message: 'Servidor y DB funcionando' });
   } catch (error) {
-    res.json({ status: 'error', message: error.message });
+    console.error('Error de conexión con MySQL:', error);
+    res.status(500).json({
+      status: 'error',
+      code: error.code || null,
+      message: error.message || 'Error desconocido de conexión con MySQL',
+    });
   }
 })
 
