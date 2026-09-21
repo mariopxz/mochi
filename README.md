@@ -153,9 +153,17 @@ DB_USER=tu_usuario
 DB_PASSWORD=tu_contraseña
 DB_NAME=mochi
 JWT_SECRET=una_clave_larga_y_privada
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=tu_usuario_smtp
+SMTP_PASSWORD=tu_contraseña_smtp
+SMTP_FROM="Mochi <noreply@tu-dominio.com>"
+URL_FRONTEND=http://localhost:5173
 ```
 
 `JWT_SECRET` debe ser una cadena larga, aleatoria y diferente en cada entorno. No la subas al repositorio.
+Las variables `SMTP_*` son necesarias para enviar los enlaces de recuperación. En producción utiliza las credenciales de un proveedor SMTP real y una dirección remitente autorizada.
 
 ### `client/.env`
 
@@ -175,6 +183,7 @@ Las variables `VITE_*` se incluyen en el bundle del navegador. No pongas secreto
 | `/login` | Público | Inicio de sesión |
 | `/register` | Público | Registro de usuario |
 | `/forgot-password` | Público | Formulario visual de recuperación |
+| `/reset-password?token=...` | Público | Cambio de contraseña mediante enlace de un solo uso |
 | `/u/:username` | Público | Perfil compartible de un usuario |
 | `/dashboard` | Protegido | Gestión de enlaces |
 | `/account` | Protegido | Datos personales, avatar y contraseña |
@@ -190,6 +199,8 @@ La API se monta directamente sobre `http://localhost:3000`.
 | --- | --- | --- | --- |
 | `POST` | `/auth/register` | Público | Crear una cuenta |
 | `POST` | `/auth/login` | Público | Iniciar sesión |
+| `POST` | `/auth/forgot-password` | Público | Solicitar un enlace de recuperación |
+| `POST` | `/auth/reset-password` | Público | Cambiar la contraseña usando un token válido |
 | `GET` | `/auth/me` | JWT | Obtener el perfil autenticado |
 | `PUT` | `/auth/profile` | JWT | Actualizar el perfil |
 | `PUT` | `/auth/password` | JWT | Cambiar la contraseña actual |
@@ -241,7 +252,7 @@ Ejecuta los comandos desde `server/`:
 
 Mochi está en desarrollo activo. La autenticación, los perfiles, la gestión de enlaces y la subida de avatares están implementados.
 
-La ruta `/forgot-password` ya está integrada en el cliente como flujo visual, pero todavía necesita un endpoint en el servidor y un proveedor de correo para enviar enlaces reales de recuperación.
+La recuperación de contraseña utiliza enlaces de un solo uso con una caducidad de 30 minutos. Requiere que la tabla `password_resets` exista en MySQL y que las variables SMTP estén configuradas. El endpoint guarda el hash del token y elimina el registro después de actualizar la contraseña.
 
 También quedan como siguientes mejoras naturales:
 

@@ -1,14 +1,30 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
+import { requestPasswordReset } from "../services/api";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setSubmitted(true);
+    setError("");
+    setLoading(true);
+
+    try {
+      await requestPasswordReset(email);
+      setSubmitted(true);
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+          "No se pudo iniciar la recuperación de contraseña.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,6 +53,15 @@ export default function ForgotPassword() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div
+              role="alert"
+              className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700"
+            >
+              {error}
+            </div>
+          )}
+
           <div>
             <label
               htmlFor="recovery-email"
@@ -59,9 +84,10 @@ export default function ForgotPassword() {
 
           <button
             type="submit"
-            className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-100 transition hover:bg-indigo-700"
+            disabled={loading}
+            className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-100 transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Enviar instrucciones
+            {loading ? "Enviando..." : "Enviar instrucciones"}
           </button>
         </form>
       )}
