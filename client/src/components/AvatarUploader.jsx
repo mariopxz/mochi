@@ -29,7 +29,7 @@ export default function AvatarUploader({ onUpload }) {
     formData.append("file", file);
     formData.append(
       "upload_preset",
-      import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+      import.meta.env.MOCHI_CLOUDINARY_UPLOAD_PRESET,
     );
 
     setUploading(true);
@@ -37,7 +37,7 @@ export default function AvatarUploader({ onUpload }) {
     try {
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${
-          import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+          import.meta.env.MOCHI_CLOUDINARY_CLOUD_NAME
         }/image/upload`,
         {
           method: "POST",

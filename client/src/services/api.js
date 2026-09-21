@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.MOCHI_API_URL,
 })
 
 // Interceptor - añade el token automáticamente a cada petición
