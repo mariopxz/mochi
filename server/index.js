@@ -28,6 +28,17 @@ app.get('/protected', authMiddleware, (req, res) => {
 const db = require('./db/connection');
 
 app.get('/health', async (req, res) => {
+  const requiredDbVariables = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+  const missingDbVariables = requiredDbVariables.filter((name) => !process.env[name]);
+
+  if (missingDbVariables.length > 0) {
+    return res.status(500).json({
+      status: 'error',
+      code: 'MISSING_DB_ENV',
+      message: `Faltan variables de entorno: ${missingDbVariables.join(', ')}`,
+    });
+  }
+
   try {
     await db.query('SELECT 1');
     res.json({ status: 'ok', message: 'Servidor y DB funcionando' });
@@ -35,8 +46,8 @@ app.get('/health', async (req, res) => {
     console.error('Error de conexión con MySQL:', error);
     res.status(500).json({
       status: 'error',
-      code: error.code || null,
-      message: error.message || 'Error desconocido de conexión con MySQL',
+      code: error?.code || null,
+      message: error?.sqlMessage || error?.message || String(error),
     });
   }
 })
