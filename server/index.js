@@ -5,7 +5,10 @@ require('dotenv').config();
 const app = express();
 
 // Middlewares
-app.use(cors());
+// Restingir las peticiones al dominio configurado en la variable de entorno
+app.use(cors({
+  origin: process.env.URL_FRONTEND,
+}));
 app.use(express.json());
 
 // Rutas
