@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { clickLink, getProfile } from "../services/api";
+import PageTitle from "../components/PageTitle";
 
 export default function Profile() {
   const { username } = useParams();
@@ -11,6 +12,8 @@ export default function Profile() {
   const [notFound, setNotFound] = useState(false);
   const [reservedRoute, setReservedRoute] = useState(false);
   const [error, setError] = useState("");
+
+  const profileTitle = user ? `@${user.username}` : "Perfil";
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -46,56 +49,70 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-        <p className="text-sm text-slate-500">Cargando perfil...</p>
-      </main>
+      <>
+        <PageTitle title={profileTitle} />
+        <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+          <p className="text-sm text-slate-500">Cargando perfil...</p>
+        </main>
+      </>
     );
   }
 
   if (notFound) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-        <div className="max-w-sm text-center">
-          <p className="text-5xl">🍡</p>
-          <h1 className="mt-4 text-2xl font-bold text-slate-900">
-            Usuario no encontrado
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            El perfil @{username} no existe o ya no está disponible.
-          </p>
-        </div>
-      </main>
+      <>
+        <PageTitle title="Usuario no encontrado" />
+        <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+          <div className="max-w-sm text-center">
+            <p className="text-5xl">🍡</p>
+            <h1 className="mt-4 text-2xl font-bold text-slate-900">
+              Usuario no encontrado
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              El perfil @{username} no existe o ya no está disponible.
+            </p>
+          </div>
+        </main>
+      </>
     );
   }
 
   if (reservedRoute) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-        <div className="max-w-sm text-center">
-          <p className="text-5xl">🍡</p>
-          <h1 className="mt-4 text-2xl font-bold text-slate-900">
-            Ruta reservada
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            La ruta {username} no está disponible.
-          </p>
-        </div>
-      </main>
+      <>
+        <PageTitle title="Ruta reservada" />
+        <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+          <div className="max-w-sm text-center">
+            <p className="text-5xl">🍡</p>
+            <h1 className="mt-4 text-2xl font-bold text-slate-900">
+              Ruta reservada
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              La ruta {username} no está disponible.
+            </p>
+          </div>
+        </main>
+      </>
     );
   }
 
   if (error) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </p>
-      </main>
+      <>
+        <PageTitle title="Error al cargar el perfil" />
+        <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+          <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </p>
+        </main>
+      </>
     );
   }
 
   return (
-  <main className="min-h-screen bg-gradient-to-b from-indigo-100 via-slate-50 to-white px-4 py-10 sm:px-6">
+  <>
+    <PageTitle title={profileTitle} />
+    <main className="min-h-screen bg-gradient-to-b from-indigo-100 via-slate-50 to-white px-4 py-10 sm:px-6">
     <div className="mx-auto w-full max-w-md">
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-indigo-100/60">
         <div className="h-32 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500" />
@@ -158,6 +175,7 @@ export default function Profile() {
         Hecho con <span className="font-medium text-indigo-600">mochi 🍡</span>
       </footer>
     </div>
-  </main>
+    </main>
+  </>
 );
 }

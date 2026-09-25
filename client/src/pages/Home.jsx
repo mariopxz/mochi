@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProfilePreview from "../components/ProfilePreview";
+import PageTitle from "../components/PageTitle";
 import { demoProfile } from "../constants/demoProfile";
 
 const features = [
@@ -25,6 +26,15 @@ const features = [
 ];
 
 export default function Home() {
+  return (
+    <>
+      <PageTitle title="Mochi: Tu espacio en internet" />
+      <HomeContent />
+    </>
+  );
+}
+
+function HomeContent() {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
 

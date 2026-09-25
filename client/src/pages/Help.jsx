@@ -2,8 +2,18 @@ import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getMe } from "../services/api";
 import { useAuth } from "../context/useAuth";
+import PageTitle from "../components/PageTitle";
 
 export default function Help() {
+  return (
+    <>
+      <PageTitle title="Ayuda" />
+      <HelpContent />
+    </>
+  );
+}
+
+function HelpContent() {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);

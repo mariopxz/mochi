@@ -2,8 +2,18 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import { resetPassword } from "../services/api";
+import PageTitle from "../components/PageTitle";
 
 export default function ResetPassword() {
+  return (
+    <>
+      <PageTitle title="Restablecer contraseña" />
+      <ResetPasswordContent />
+    </>
+  );
+}
+
+function ResetPasswordContent() {
   const [searchParams] = useSearchParams();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

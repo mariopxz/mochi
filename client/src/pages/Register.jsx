@@ -3,8 +3,18 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { register } from "../services/api";
 import { useAuth } from "../context/useAuth";
 import AuthLayout from "../components/AuthLayout";
+import PageTitle from "../components/PageTitle";
 
 export default function Register() {
+  return (
+    <>
+      <PageTitle title="Crear cuenta" />
+      <RegisterContent />
+    </>
+  );
+}
+
+function RegisterContent() {
   const [name, setName] = useState("");
   const [searchParams] = useSearchParams();
   const [username, setUsername] = useState(
