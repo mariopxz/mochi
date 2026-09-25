@@ -1,0 +1,39 @@
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+})
+
+// Interceptor - añade el token automáticamente a cada petición
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('mochi_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Auth
+export const register = (data) => api.post('/auth/register', data);
+export const login = (data) => api.post('/auth/login', data);
+export const requestPasswordReset = (email) => api.post('/auth/forgot-password', { email });
+export const resetPassword = (data) => api.post('/auth/reset-password', data);
+
+// Links
+export const getLinks = () => api.get('/links');
+export const createLink = (data) => api.post('/links', data);
+export const updateLink = (id, data) => api.put(`/links/${id}`, data);
+export const deleteLink = (id) => api.delete(`/links/${id}`);
+export const reorderLinks = (links) => api.put('/links/reorder', { links });
+export const clickLink = (id) => api.post(`/links/${id}/click`);
+
+// Perfil público
+export const getProfile = (username) => api.get(`/u/${username}`);
+export const updateProfile = (data) => api.put('/auth/profile', data);
+export const getMe = () => api.get(`/auth/me`);
+
+// Perfil privado
+export const updatePassword = (data) => api.put('/auth/password', data);
+export const updateEmail = (data) => api.put('/auth/email', data);
+
+export default api;
