@@ -28,7 +28,7 @@ const features = [
 export default function Home() {
   return (
     <>
-      <PageTitle title="Mochi: Tu espacio en internet" />
+      <PageTitle title="Tu espacio en internet" />
       <HomeContent />
     </>
   );
