@@ -4,22 +4,14 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const db = require('../db/connection');
 const authMiddleware = require('../middleware/auth');
 const { normalizeSpaces, removeAllSpaces, scapeHtml } = require('../utils/sanitize');
 
 const PASSWORD_RESET_TTL_MS = 15 * 60 * 1000;
 
-const passwordResetTransporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const hashResetToken = (token) =>
   crypto.createHash('sha256').update(token).digest('hex');
@@ -261,7 +253,7 @@ router.post('/forgot-password', async (req, res) => {
 
     const resetUrl = `${process.env.URL_FRONTEND}/reset-password?token=${encodeURIComponent(token)}`;
     const mailOptions = {
-      from: process.env.SMTP_FROM,
+      from: process.env.RESEND_FROM,
       to: sanitizedInputs.email,
       subject: "Recupera tu contraseña en Mochi",
       text: `Hola. Recupera tu contraseña desde este enlace: ${resetUrl}. El enlace caduca en 15 minutos.`,
@@ -335,16 +327,13 @@ router.post('/forgot-password', async (req, res) => {
       `,
     };
 
-    console.log('Intentando enviar email a:', sanitizedInputs.email)
-    console.log('SMTP config:', {
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE,
-      user: process.env.SMTP_USER,
-      from: process.env.SMTP_FROM
+    await resend.emails.send({
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+      text: mailOptions.text,
     })
-
-    await passwordResetTransporter.sendMail(mailOptions);
     console.log('Email enviado correctamente')
     return res.json({
       message: 'Si el correo existe, recibirás instrucciones para recuperar tu contraseña.'
