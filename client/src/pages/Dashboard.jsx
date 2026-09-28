@@ -26,8 +26,43 @@ import SortableLinkItem from "../components/SortableLinkItem";
 import { useAuth } from "../context/useAuth";
 import ProfilePreview from "../components/ProfilePreview";
 import PageTitle from "../components/PageTitle";
+import { ExternalLink } from "lucide-react";
 
 const emptyLink = { title: "", url: "" };
+const platformPresets = [
+  { title: "LinkedIn", domains: ["linkedin.com", "lnkd.in"] },
+  { title: "YouTube", domains: ["youtube.com", "youtu.be"] },
+  { title: "X", domains: ["x.com", "twitter.com"] },
+  { title: "Threads", domains: ["threads.net"] },
+  { title: "Instagram", domains: ["instagram.com", "instagr.am"] },
+  { title: "TikTok", domains: ["tiktok.com"] },
+  { title: "Facebook", domains: ["facebook.com", "fb.watch"] },
+  { title: "GitHub", domains: ["github.com"] },
+  { title: "Twitch", domains: ["twitch.tv"] },
+  { title: "Spotify", domains: ["spotify.com", "open.spotify.com"] },
+  { title: "Pinterest", domains: ["pinterest.com", "pin.it"] },
+  { title: "Discord", domains: ["discord.com", "discord.gg"] },
+];
+
+function detectPlatformTitle(rawUrl) {
+  const value = rawUrl.trim();
+  if (!value) return "";
+
+  try {
+    const url = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+    const hostname = new URL(url).hostname.toLowerCase();
+
+    return (
+      platformPresets.find(({ domains }) =>
+        domains.some(
+          (domain) => hostname === domain || hostname.endsWith(`.${domain}`),
+        ),
+      )?.title || ""
+    );
+  } catch {
+    return "";
+  }
+}
 
 function normaliseUrl(raw) {
   if (typeof raw !== "string") {
@@ -88,6 +123,7 @@ function DashboardContent() {
   const [userData, setUserData] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const autoDetectedTitle = useRef("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -150,6 +186,28 @@ function DashboardContent() {
     setMenuOpen(!menuOpen);
   };
 
+  const handleNewLinkUrlChange = (event) => {
+    const url = event.target.value;
+    const detectedTitle = detectPlatformTitle(url);
+
+    setNewLink((current) => {
+      const titleWasAutoDetected =
+        !current.title.trim() || current.title === autoDetectedTitle.current;
+
+      if (!titleWasAutoDetected) {
+        return { ...current, url };
+      }
+
+      autoDetectedTitle.current = detectedTitle;
+      return { ...current, url, title: detectedTitle };
+    });
+  };
+
+  const handleNewLinkTitleChange = (event) => {
+    autoDetectedTitle.current = "";
+    setNewLink((current) => ({ ...current, title: event.target.value }));
+  };
+
   const handleCreate = async (event) => {
     event.preventDefault();
     setError("");
@@ -160,6 +218,7 @@ function DashboardContent() {
       const { data } = await createLink(payload);
       setLinks((current) => [...current, data]);
       setNewLink(emptyLink);
+      autoDetectedTitle.current = "";
     } catch (err) {
       setError(err.response?.data?.message || "No se pudo crear el link.");
     } finally {
@@ -413,11 +472,24 @@ function DashboardContent() {
 
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section>
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">Hola, {userData?.name} 👋</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Añade, edita y organiza los enlaces que compartirás.
-            </p>
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Hola, {userData?.name} 👋</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                Añade, edita y organiza los enlaces que compartirás.
+              </p>
+            </div>
+            {userData?.username && (
+              <Link
+                to={`/${encodeURIComponent(userData.username)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition hover:-translate-y-0.5 hover:cursor-pointer hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 sm:self-auto"
+              >
+                <ExternalLink size={18} aria-hidden="true" />
+                Ver mi perfil
+              </Link>
+            )}
           </div>
 
           {error && (
@@ -437,9 +509,7 @@ function DashboardContent() {
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <input
                 value={newLink.title}
-                onChange={(event) =>
-                  setNewLink({ ...newLink, title: event.target.value })
-                }
+                onChange={handleNewLinkTitleChange}
                 placeholder="Título (ej. Mi portfolio)"
                 required
                 className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
@@ -447,9 +517,7 @@ function DashboardContent() {
               <input
                 type="url"
                 value={newLink.url}
-                onChange={(event) =>
-                  setNewLink({ ...newLink, url: event.target.value })
-                }
+                onChange={handleNewLinkUrlChange}
                 placeholder="https://ejemplo.com"
                 required
                 className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
