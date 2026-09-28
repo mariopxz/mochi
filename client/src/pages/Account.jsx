@@ -4,6 +4,7 @@ import { getMe, updateProfile, updatePassword, updateEmail } from "../services/a
 import { useAuth } from "../context/useAuth";
 import AvatarUploader from "../components/AvatarUploader";
 import PageTitle from "../components/PageTitle";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Account() {
   return (
@@ -24,6 +25,8 @@ function AccountContent() {
     oldPassword: "",
     newPassword: "",
   });
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [emailForm, setEmailForm] = useState({
     newEmail: "",
   });
@@ -524,31 +527,51 @@ function AccountContent() {
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <input
-              type="password"
-              value={passwordForm.oldPassword}
-              onChange={(event) =>
-                setPasswordForm((current) => ({
-                  ...current,
-                  oldPassword: event.target.value,
-                }))
-              }
-              placeholder="Contraseña actual"
-              className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-400"
-            />
+            <div className="relative">
+              <input
+                type={showOldPassword ? "text" : "password"}
+                value={passwordForm.oldPassword}
+                onChange={(event) =>
+                  setPasswordForm((current) => ({
+                    ...current,
+                    oldPassword: event.target.value,
+                  }))
+                }
+                placeholder="Contraseña actual"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-10 text-sm text-slate-400"
+              />
+              <button
+                type="button"
+                onClick={() => setShowOldPassword((visible) => !visible)}
+                aria-label={showOldPassword ? "Ocultar contraseña actual" : "Mostrar contraseña actual"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500 hover:text-slate-700"
+              >
+                {showOldPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
 
-            <input
-              type="password"
-              value={passwordForm.newPassword}
-              onChange={(event) =>
-                setPasswordForm((current) => ({
-                  ...current,
-                  newPassword: event.target.value,
-                }))
-              }
-              placeholder="Nueva contraseña"
-              className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-400"
-            />
+            <div className="relative">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                value={passwordForm.newPassword}
+                onChange={(event) =>
+                  setPasswordForm((current) => ({
+                    ...current,
+                    newPassword: event.target.value,
+                  }))
+                }
+                placeholder="Nueva contraseña"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-10 text-sm text-slate-400"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword((visible) => !visible)}
+                aria-label={showNewPassword ? "Ocultar nueva contraseña" : "Mostrar nueva contraseña"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500 hover:text-slate-700"
+              >
+                {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <div className="mt-1 flex justify-end pt-5">
