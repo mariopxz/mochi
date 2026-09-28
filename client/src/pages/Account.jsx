@@ -3,8 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { getMe, updateProfile, updatePassword, updateEmail } from "../services/api";
 import { useAuth } from "../context/useAuth";
 import AvatarUploader from "../components/AvatarUploader";
+import PageTitle from "../components/PageTitle";
 
 export default function Account() {
+  return (
+    <>
+      <PageTitle title="Mi cuenta" />
+      <AccountContent />
+    </>
+  );
+}
+
+function AccountContent() {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);

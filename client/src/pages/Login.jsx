@@ -3,8 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/api";
 import { useAuth } from "../context/useAuth";
 import AuthLayout from "../components/AuthLayout";
+import PageTitle from "../components/PageTitle";
 
 export default function Login() {
+  return (
+    <>
+      <PageTitle title="Iniciar sesión" />
+      <LoginContent />
+    </>
+  );
+}
+
+function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);

@@ -25,6 +25,7 @@ import {
 import SortableLinkItem from "../components/SortableLinkItem";
 import { useAuth } from "../context/useAuth";
 import ProfilePreview from "../components/ProfilePreview";
+import PageTitle from "../components/PageTitle";
 
 const emptyLink = { title: "", url: "" };
 
@@ -66,6 +67,15 @@ function normaliseUrl(raw) {
 }
 
 export default function Dashboard() {
+  return (
+    <>
+      <PageTitle title="Dashboard" />
+      <DashboardContent />
+    </>
+  );
+}
+
+function DashboardContent() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [links, setLinks] = useState([]);

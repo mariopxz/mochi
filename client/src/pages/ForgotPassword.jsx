@@ -2,8 +2,18 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import { requestPasswordReset } from "../services/api";
+import PageTitle from "../components/PageTitle";
 
 export default function ForgotPassword() {
+  return (
+    <>
+      <PageTitle title="Recuperar contraseña" />
+      <ForgotPasswordContent />
+    </>
+  );
+}
+
+function ForgotPasswordContent() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
