@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { clickLink, getProfile } from "../services/api";
 import PageTitle from "../components/PageTitle";
+import { ArrowRight } from "lucide-react";
 
 export default function Profile() {
   const { username } = useParams();
@@ -173,6 +174,18 @@ export default function Profile() {
 
       <footer className="mt-8 text-center text-xs text-slate-400">
         Hecho con <span className="font-medium text-indigo-600">mochi 🍡</span>
+        <div className="mt-5">
+          <p className="mb-3 text-sm font-medium text-slate-600">
+            ¿Te gustaría tener tu propio espacio?
+          </p>
+          <Link
+            to="/register"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition hover:-translate-y-0.5 hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+          >
+            Crea tu perfil en Mochi 🍡
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        </div>
       </footer>
     </div>
     </main>
