@@ -26,7 +26,7 @@ const hashResetToken = (token) =>
 
 // POST /auth/register
 router.post('/register', async (req, res) => {
-  const {name, username, email, password } = req.body;
+  const { name, username, email, password } = req.body;
   const sanitizedInputs = {
     name: normalizeSpaces(name),
     username: removeAllSpaces(username),
@@ -335,7 +335,17 @@ router.post('/forgot-password', async (req, res) => {
       `,
     };
 
+    console.log('Intentando enviar email a:', sanitizedInputs.email)
+    console.log('SMTP config:', {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE,
+      user: process.env.SMTP_USER,
+      from: process.env.SMTP_FROM
+    })
+
     await passwordResetTransporter.sendMail(mailOptions);
+    console.log('Email enviado correctamente')
     return res.json({
       message: 'Si el correo existe, recibirás instrucciones para recuperar tu contraseña.'
     });
