@@ -8,6 +8,7 @@ const { Resend } = require('resend');
 const db = require('../db/connection');
 const authMiddleware = require('../middleware/auth');
 const { normalizeSpaces, removeAllSpaces, scapeHtml } = require('../utils/sanitize');
+const { loginLimiter, registerLimiter, forgotPasswordLimiter, resetPasswordLimiter, apiLimiter } = require('../utils/rateLimiters');
 
 const PASSWORD_RESET_TTL_MS = 15 * 60 * 1000;
 
@@ -17,7 +18,7 @@ const hashResetToken = (token) =>
   crypto.createHash('sha256').update(token).digest('hex');
 
 // POST /auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', registerLimiter, async (req, res) => {
   const { name, username, email, password } = req.body;
   const sanitizedInputs = {
     name: normalizeSpaces(name),
@@ -48,12 +49,12 @@ router.post('/register', async (req, res) => {
 
     // Generar JWT
     const token = jwt.sign(
-      { id: result.insertId, username },
+      { id: result.insertId, username: sanitizedInputs.username },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
-    res.status(201).json({ token, username });
+    res.status(201).json({ token, username: sanitizedInputs.username });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -61,7 +62,7 @@ router.post('/register', async (req, res) => {
 })
 
 // POST /auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
   const sanitizedInputs = {
     email: removeAllSpaces(email),
@@ -104,7 +105,7 @@ router.post('/login', async (req, res) => {
 
 
 // GET /auth/me
-router.get('/me', authMiddleware, async (req, res) => {
+router.get('/me', apiLimiter, authMiddleware, async (req, res) => {
   try {
     const [userData] = await db.query(
       'SELECT name, username, email, avatar, bio FROM users WHERE id = ?',
@@ -122,7 +123,7 @@ router.get('/me', authMiddleware, async (req, res) => {
 });
 
 // PUT /auth/profile -- Actualizar el perfil del usuario
-router.put('/profile', authMiddleware, async (req, res) => {
+router.put('/profile', apiLimiter, authMiddleware, async (req, res) => {
   const { name, username, bio, avatar } = req.body;
   const sanitizedInputs = {
     name: normalizeSpaces(name),
@@ -153,7 +154,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
 })
 
 // PUT /auth/password -- Actualizar la contraseña del usuario
-router.put('/password', authMiddleware, async (req, res) => {
+router.put('/password', apiLimiter, authMiddleware, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const sanitizedInputs = {
     oldPassword: oldPassword.trim(),
@@ -195,7 +196,7 @@ router.put('/password', authMiddleware, async (req, res) => {
 })
 
 // PUT /auth/email -- Actualizar el email del usuario
-router.put('/email', authMiddleware, async (req, res) => {
+router.put('/email', apiLimiter, authMiddleware, async (req, res) => {
   const { newEmail } = req.body;
   const sanitizedInputs = {
     newEmail: removeAllSpaces(newEmail)
@@ -223,7 +224,7 @@ router.put('/email', authMiddleware, async (req, res) => {
 })
 
 // POST /auth/forgot-password
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
   const { email } = req.body;
   const sanitizedInputs = {
     email: removeAllSpaces(email).toLowerCase()
@@ -348,7 +349,7 @@ router.post('/forgot-password', async (req, res) => {
 });
 
 // POST /auth/reset-password
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', resetPasswordLimiter, async (req, res) => {
   const { token, newPassword } = req.body;
   const sanitizedToken = typeof token === 'string' ? token.trim() : '';
   const sanitizedPassword = typeof newPassword === 'string' ? newPassword.trim() : '';

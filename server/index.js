@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { apiLimiter } = require('./utils/rateLimiters');
 
 const app = express();
 
@@ -8,6 +9,7 @@ const app = express();
 // Restingir las peticiones al dominio configurado en la variable de entorno
 app.use(cors({
   origin: process.env.URL_FRONTEND,
+  exposedHeaders: ['RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset']
 }));
 app.use(express.json());
 
@@ -16,7 +18,7 @@ const authRoutes = require('./routes/auth');
 const linksRoutes = require('./routes/links');
 const profileRoutes = require('./routes/profile');
 app.use('/auth', authRoutes);
-app.use('/links', linksRoutes);
+app.use('/links', apiLimiter, linksRoutes);
 app.use('/', profileRoutes);
 
 const authMiddleware = require('./middleware/auth');

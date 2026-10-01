@@ -35,7 +35,21 @@ function LoginContent() {
       saveLogin(data.token, data.username);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Error al iniciar sesión");
+      if (err.response?.status === 429) {
+        const retryAfter = err.response?.headers?.["ratelimit-reset"];
+        if (retryAfter) {
+          const minutes = Math.ceil(retryAfter / 60);
+          setError(
+            `Demasiados intentos. Por favor, espera ${minutes} minuto${minutes !== 1 ? "s" : ""} e inténtalo de nuevo.`,
+          );
+        } else {
+          setError(
+            "Demasiados intentos. Por favor, espera unos minutos e inténtalo de nuevo.",
+          );
+        }
+      } else {
+        setError(err.response?.data?.message || "Error al iniciar sesión");
+      }
     } finally {
       setLoading(false);
     }
