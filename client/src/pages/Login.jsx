@@ -132,9 +132,7 @@ function LoginContent() {
             <button
               type="button"
               onClick={() => setShowPassword((visible) => !visible)}
-              aria-label={
-                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
-              }
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500 hover:text-slate-700"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
