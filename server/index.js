@@ -9,6 +9,7 @@ const app = express();
 // Restingir las peticiones al dominio configurado en la variable de entorno
 app.use(cors({
   origin: process.env.URL_FRONTEND,
+  exposedHeaders: ['RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset']
 }));
 app.use(express.json());
 
