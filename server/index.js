@@ -20,10 +20,7 @@ const separatorsRoutes = require('./routes/separators');
 const profileRoutes = require('./routes/profile');
 app.use('/auth', authRoutes);
 app.use('/links', apiLimiter, linksRoutes);
-<<<<<<< HEAD
 app.use('/separators', apiLimiter, separatorsRoutes);
-=======
->>>>>>> origin/main
 app.use('/', profileRoutes);
 
 const authMiddleware = require('./middleware/auth');
