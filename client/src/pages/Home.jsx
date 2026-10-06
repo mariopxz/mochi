@@ -307,17 +307,35 @@ function HomeContent() {
       </section>
 
       <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-7 text-center text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left">
-          <p className="font-semibold text-indigo-600">mochi 🍡</p>
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-7 text-sm text-slate-500 sm:px-6">
+          <div className="flex flex-col items-center justify-between gap-3 sm:flex-row sm:text-left">
+            <p className="font-semibold text-indigo-600">mochi 🍡</p>
+            <p>Un lugar simple para compartir lo que importa.</p>
+            <Link
+              to="/login"
+              className="font-medium text-slate-600 transition hover:text-indigo-600"
+            >
+              Iniciar sesión
+            </Link>
+          </div>
 
-          <p>Un lugar simple para compartir lo que importa.</p>
-
-          <Link
-            to="/login"
-            className="font-medium text-slate-600 transition hover:text-indigo-600"
+          <nav
+            aria-label="Políticas legales"
+            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:justify-start"
           >
-            Iniciar sesión
-          </Link>
+            <Link to="/legal" className="transition hover:text-indigo-600">
+              Términos de uso
+            </Link>
+            <Link to="/legal" className="transition hover:text-indigo-600">
+              Privacidad
+            </Link>
+            <Link to="/legal" className="transition hover:text-indigo-600">
+              Cookies
+            </Link>
+            <Link to="/legal" className="transition hover:text-indigo-600">
+              Aviso legal
+            </Link>
+          </nav>
         </div>
       </footer>
     </main>

@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import Home from './pages/Home';
 import Account from './pages/Account';
 import Help from './pages/Help';
+import Legal from './pages/Legal';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
@@ -48,6 +49,7 @@ function App() {
         <Route path="/help" element={
             <Help />
         } />
+        <Route path="/legal" element={<Legal />} />
         <Route path="/" element={
           <PublicRoute>
             <Home />
