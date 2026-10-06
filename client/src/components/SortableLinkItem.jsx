@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { SquarePen, Trash } from 'lucide-react';
+import { GripVertical, SquarePen, Trash } from 'lucide-react';
 
 export default function SortableLinkItem({
   link,
@@ -20,13 +20,16 @@ export default function SortableLinkItem({
     setActivatorNodeRef,
     transform,
     transition,
-  } = useSortable({ 
-    id: link.id,
+  } = useSortable({
+    id: `link:${link.id}`,
     disabled: isEditing,
   });
 
+  const verticalTransform = transform
+    ? { ...transform, x: 0 }
+    : null;
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Transform.toString(verticalTransform),
     transition
   };
 
@@ -34,7 +37,7 @@ export default function SortableLinkItem({
     <article
       ref={setNodeRef}
       style={style}
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+      className="w-full min-w-0 touch-none select-none rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
     >
       {isEditing ? (
         <form onSubmit={onSave} className="space-y-3">
@@ -81,9 +84,9 @@ export default function SortableLinkItem({
             {...attributes}
             {...listeners}
             aria-label={`Reordenar ${link.title}`}
-            className="mt-1 cursor-grab touch-none rounded p-1 text-indigo-400 hover:bg-slate-100 hover:text-slate-700 active:cursor-grabbing"
+            className="mt-1 cursor-grab touch-none select-none rounded p-1 text-indigo-400 hover:bg-slate-100 hover:text-slate-700 active:cursor-grabbing"
           >
-            ⋮⋮
+            <GripVertical className="h-5 w-5" aria-hidden="true" />
           </button>
 
           <div className="min-w-0 flex-1">

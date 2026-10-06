@@ -19,12 +19,15 @@ export const login = (data) => api.post('/auth/login', data);
 export const requestPasswordReset = (email) => api.post('/auth/forgot-password', { email });
 export const resetPassword = (data) => api.post('/auth/reset-password', data);
 
-// Links
+// Links y separadores
 export const getLinks = () => api.get('/links');
 export const createLink = (data) => api.post('/links', data);
 export const updateLink = (id, data) => api.put(`/links/${id}`, data);
 export const deleteLink = (id) => api.delete(`/links/${id}`);
-export const reorderLinks = (links) => api.put('/links/reorder', { links });
+export const createSeparator = (data) => api.post('/separators', data);
+export const updateSeparator = (id, data) => api.put(`/separators/${id}`, data);
+export const deleteSeparator = (id) => api.delete(`/separators/${id}`);
+export const reorderLinks = (items) => api.put('/links/reorder', { items });
 export const clickLink = (id) => api.post(`/links/${id}/click`);
 
 // Perfil público
