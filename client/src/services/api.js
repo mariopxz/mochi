@@ -38,5 +38,8 @@ export const getMe = () => api.get(`/auth/me`);
 // Perfil privado
 export const updatePassword = (data) => api.put('/auth/password', data);
 export const updateEmail = (data) => api.put('/auth/email', data);
+export const startAccountDeletion = (password) => api.post('/auth/delete-account', { password });
+export const getAccountDeletionStatus = () => api.get('/auth/delete-account');
+export const processAccountDeletion = () => api.put('/auth/delete-account');
 
 export default api;

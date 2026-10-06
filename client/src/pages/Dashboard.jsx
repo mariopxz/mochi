@@ -593,7 +593,7 @@ function DashboardContent() {
             </div>
             <button
               disabled={submitting}
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
               <Plus size={16} aria-hidden="true" />
               {submitting ? "Guardando..." : "Añadir enlace"}
