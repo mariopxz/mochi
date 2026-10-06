@@ -16,19 +16,26 @@ import {
 } from "@dnd-kit/sortable";
 import {
   createLink,
+  createSeparator,
   deleteLink,
+  deleteSeparator,
   getLinks,
   reorderLinks,
   updateLink,
+  updateSeparator,
   getMe,
 } from "../services/api";
 import SortableLinkItem from "../components/SortableLinkItem";
+import SortableSeparatorItem from "../components/SortableSeparatorItem";
 import { useAuth } from "../context/useAuth";
 import ProfilePreview from "../components/ProfilePreview";
 import PageTitle from "../components/PageTitle";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Plus, Sparkles } from "lucide-react";
 
 const emptyLink = { title: "", url: "" };
+const emptySeparator = { name: "" };
+const getSortableId = (item) =>
+  item.type === "separator" ? `separator:${item.id}` : `link:${item.id}`;
 const platformPresets = [
   { title: "LinkedIn", domains: ["linkedin.com", "lnkd.in"] },
   { title: "YouTube", domains: ["youtube.com", "youtu.be"] },
@@ -115,8 +122,11 @@ function DashboardContent() {
   const navigate = useNavigate();
   const [links, setLinks] = useState([]);
   const [newLink, setNewLink] = useState(emptyLink);
+  const [newSeparator, setNewSeparator] = useState(emptySeparator);
   const [editingId, setEditingId] = useState(null);
   const [editingLink, setEditingLink] = useState(emptyLink);
+  const [editingSeparatorId, setEditingSeparatorId] = useState(null);
+  const [editingSeparatorName, setEditingSeparatorName] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -226,6 +236,22 @@ function DashboardContent() {
     }
   };
 
+  const handleCreateSeparator = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+
+    try {
+      const { data } = await createSeparator(newSeparator);
+      setLinks((current) => [...current, data]);
+      setNewSeparator(emptySeparator);
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudo crear el separador.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const startEditing = (link) => {
     setEditingId(link.id);
     setEditingLink({ title: link.title, url: link.url });
@@ -257,30 +283,71 @@ function DashboardContent() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (item) => {
+    const label = item.type === "separator" ? "separador" : "link";
     if (
       !window.confirm(
-        "¿Quieres eliminar este link? Esta acción no se puede deshacer.",
+        `¿Quieres eliminar este ${label}? Esta acción no se puede deshacer.`,
       )
     )
       return;
 
     setError("");
     try {
-      await deleteLink(id);
+      if (item.type === "separator") {
+        await deleteSeparator(item.id);
+      } else {
+        await deleteLink(item.id);
+      }
       setLinks((current) =>
-        current.filter((link) => String(link.id) !== String(id)),
+        current.filter((entry) => String(entry.id) !== String(item.id)),
       );
     } catch (err) {
-      setError(err.response?.data?.message || "No se pudo eliminar el link.");
+      setError(err.response?.data?.message || `No se pudo eliminar el ${label}.`);
+    }
+  };
+
+  const startEditingSeparator = (separator) => {
+    setEditingSeparatorId(separator.id);
+    setEditingSeparatorName(separator.name);
+    setError("");
+  };
+
+  const handleUpdateSeparator = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+
+    try {
+      const { data } = await updateSeparator(editingSeparatorId, {
+        name: editingSeparatorName,
+      });
+      setLinks((current) =>
+        current.map((item) =>
+          item.type === "separator" &&
+          String(item.id) === String(editingSeparatorId)
+            ? { ...item, ...data, type: "separator" }
+            : item,
+        ),
+      );
+      setEditingSeparatorId(null);
+      setEditingSeparatorName("");
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudo actualizar el separador.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleDragEnd = async ({ active, over }) => {
     if (!over || active.id === over.id) return;
 
-    const oldIndex = links.findIndex((link) => link.id === active.id);
-    const newIndex = links.findIndex((link) => link.id === over.id);
+    const oldIndex = links.findIndex(
+      (item) => getSortableId(item) === active.id,
+    );
+    const newIndex = links.findIndex(
+      (item) => getSortableId(item) === over.id,
+    );
 
     const previousLinks = links;
     const updatedLinks = arrayMove(links, oldIndex, newIndex);
@@ -290,12 +357,13 @@ function DashboardContent() {
     setError("");
 
     try {
-      const linksWithPositions = updatedLinks.map((link, position) => ({
-        id: link.id,
+      const itemsWithPositions = updatedLinks.map((item, position) => ({
+        id: item.id,
+        type: item.type,
         position,
       }));
 
-      await reorderLinks(linksWithPositions);
+      await reorderLinks(itemsWithPositions);
     } catch (err) {
       // Si la base de datos no se actualiza, volvemos al orden anterior.
       setLinks(previousLinks);
@@ -470,8 +538,8 @@ function DashboardContent() {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <section>
+      <div className="mx-auto grid max-w-6xl gap-8 overflow-x-hidden px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <section className="min-w-0">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold">Hola, {userData?.name} 👋</h1>
@@ -503,7 +571,7 @@ function DashboardContent() {
 
           <form
             onSubmit={handleCreate}
-            className="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
           >
             <h2 className="font-semibold">Añadir un enlace</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -525,13 +593,42 @@ function DashboardContent() {
             </div>
             <button
               disabled={submitting}
-              className="mt-4 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
+              <Plus size={16} aria-hidden="true" />
               {submitting ? "Guardando..." : "Añadir enlace"}
             </button>
           </form>
 
-          <div className="space-y-3">
+          <form
+            onSubmit={handleCreateSeparator}
+            className="mb-8 rounded-2xl border border-violet-200 bg-violet-50/50 p-5 shadow-sm"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-violet-600" aria-hidden="true" />
+              <h2 className="font-semibold text-violet-900">Añadir un separador</h2>
+            </div>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <input
+                value={newSeparator.name}
+                onChange={(event) =>
+                  setNewSeparator({ name: event.target.value })
+                }
+                placeholder="Nombre del grupo, ej. Redes sociales"
+                required
+                maxLength={80}
+                className="min-w-0 flex-1 rounded-xl border border-violet-200 bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"
+              />
+              <button
+                disabled={submitting}
+                className="rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+              >
+                {submitting ? "Guardando..." : "Crear separador"}
+              </button>
+            </div>
+          </form>
+
+          <div className="min-w-0 space-y-3">
             <h2 className="font-semibold">Tus enlaces ({links.length})</h2>
             {loading ? (
               <p className="text-sm text-slate-500">Cargando enlaces...</p>
@@ -546,24 +643,39 @@ function DashboardContent() {
                 onDragEnd={handleDragEnd}
               >
                 <SortableContext
-                  items={links.map((link) => link.id)}
+                  items={links.map(getSortableId)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-3">
-                    {links.map((link) => (
-                      <SortableLinkItem
-                        key={link.id}
-                        link={link}
-                        isEditing={editingId === link.id}
-                        editingLink={editingLink}
-                        submitting={submitting}
-                        onStartEditing={startEditing}
-                        onEditingChange={setEditingLink}
-                        onSave={handleUpdate}
-                        onCancel={() => setEditingId(null)}
-                        onDelete={handleDelete}
-                      />
-                    ))}
+                    {links.map((item) =>
+                      item.type === "separator" ? (
+                        <SortableSeparatorItem
+                          key={`separator:${item.id}`}
+                          separator={item}
+                          isEditing={editingSeparatorId === item.id}
+                          editingName={editingSeparatorName}
+                          submitting={submitting}
+                          onStartEditing={startEditingSeparator}
+                          onEditingChange={setEditingSeparatorName}
+                          onSave={handleUpdateSeparator}
+                          onCancel={() => setEditingSeparatorId(null)}
+                          onDelete={handleDelete}
+                        />
+                      ) : (
+                        <SortableLinkItem
+                          key={`link:${item.id}`}
+                          link={item}
+                          isEditing={editingId === item.id}
+                          editingLink={editingLink}
+                          submitting={submitting}
+                          onStartEditing={startEditing}
+                          onEditingChange={setEditingLink}
+                          onSave={handleUpdate}
+                          onCancel={() => setEditingId(null)}
+                          onDelete={handleDelete}
+                        />
+                      ),
+                    )}
                   </div>
                 </SortableContext>
               </DndContext>

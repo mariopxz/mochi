@@ -1,10 +1,18 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getMe, updateProfile, updatePassword, updateEmail } from "../services/api";
+import {
+  getMe,
+  updateProfile,
+  updatePassword,
+  updateEmail,
+  startAccountDeletion,
+  getAccountDeletionStatus,
+  processAccountDeletion,
+} from "../services/api";
 import { useAuth } from "../context/useAuth";
 import AvatarUploader from "../components/AvatarUploader";
 import PageTitle from "../components/PageTitle";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Trash2 } from "lucide-react";
 
 export default function Account() {
   return (
@@ -38,6 +46,17 @@ function AccountContent() {
     avatar: "",
   });
 
+  const [deletionPassword, setDeletionPassword] = useState("");
+  const [deletionConfirmed, setDeletionConfirmed] = useState(false);
+  const [deletionStep, setDeletionStep] = useState("idle");
+  const [deletionProgress, setDeletionProgress] = useState({
+    deletedLinks: 0,
+    deletedSeparators: 0,
+    totalLinks: 0,
+    totalSeparators: 0,
+  });
+  const deletionLoopRef = useRef(false);
+
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -60,6 +79,76 @@ function AccountContent() {
 
     loadUserData();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const restoreDeletion = async () => {
+      try {
+        const { data: status } = await getAccountDeletionStatus();
+
+        if (cancelled) return;
+
+        if (status.status === "processing") {
+          setDeletionProgress(status);
+          setDeletionStep("processing");
+        } else if (status.status === "failed") {
+          setDeletionProgress(status);
+          setDeletionStep("failed");
+        }
+      } catch (error) {
+        if (!cancelled && error.response?.status !== 404) {
+          console.error("No se pudo recuperar la eliminación de cuenta:", error);
+        }
+      }
+    };
+
+    restoreDeletion();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (deletionStep !== "processing" || deletionLoopRef.current) return;
+
+    let cancelled = false;
+    deletionLoopRef.current = true;
+
+    const continueDeletion = async () => {
+      try {
+        const { data: status } = await processAccountDeletion();
+
+        if (cancelled) return;
+
+        setDeletionProgress(status);
+
+        if (status.status === "completed") {
+          logout();
+          navigate("/");
+          deletionLoopRef.current = false;
+          return;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        if (!cancelled) continueDeletion();
+      } catch (err) {
+        if (!cancelled) {
+          setDeletionStep("failed");
+          setError(
+            err.response?.data?.message || "No se pudo eliminar la cuenta. Inténtalo de nuevo.",
+          );
+          deletionLoopRef.current = false;
+        }
+      }
+    };
+
+    continueDeletion();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [deletionStep, logout, navigate]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -155,6 +244,56 @@ function AccountContent() {
     } catch (err) {
       setError(
         err.response?.data?.message || "No se pudo actualizar el perfil.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAccountDeletion = async () => {
+    if (!deletionConfirmed || !deletionPassword) {
+      setError("Introduce tu contraseña y confirma la eliminación.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setDeletionStep("starting");
+
+    try {
+      const { data: initialStatus } = await startAccountDeletion(deletionPassword);
+      setDeletionProgress(initialStatus);
+      setDeletionStep("processing");
+
+      const { data: status } = await processAccountDeletion();
+      setDeletionProgress(status);
+      deletionLoopRef.current = false;
+
+      if (status.status === "completed") {
+        logout();
+        navigate("/");
+      }
+    } catch (err) {
+      setDeletionStep("failed");
+      setError(
+        err.response?.data?.message || "No se pudo eliminar la cuenta. Inténtalo de nuevo.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCheckDeletionStatus = async () => {
+    setSaving(true);
+    setError("");
+
+    try {
+      const { data: status } = await getAccountDeletionStatus();
+      setDeletionProgress(status);
+      setDeletionStep(status.status === "failed" ? "failed" : "processing");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "No se pudo consultar el progreso de la cuenta.",
       );
     } finally {
       setSaving(false);
@@ -582,6 +721,146 @@ function AccountContent() {
             >
               Actualizar contraseña
             </button>
+          </div>
+        </section>
+
+        <section className="mt-6 overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
+          <div className="border-b border-red-100 bg-red-50 p-5 sm:p-7">
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
+                <Trash2 size={21} />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-red-900">
+                  Eliminar cuenta permanentemente
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-red-700">
+                  Esta acción elimina tu perfil, enlaces, separadores, contraseña,
+                  correo y sesión. No se puede deshacer después.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-5 sm:p-7">
+            {deletionStep === "idle" && (
+              <div className="space-y-5">
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={deletionConfirmed}
+                    onChange={(event) => setDeletionConfirmed(event.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+                  />
+                  <span>
+                    Entiendo que el proceso borrará toda la información de mi
+                    cuenta y que no podrá recuperarse.
+                  </span>
+                </label>
+
+                <div>
+                  <label
+                    htmlFor="deletion-password"
+                    className="mb-2 block text-sm font-medium text-slate-700"
+                  >
+                    Contraseña actual
+                  </label>
+                  <input
+                    id="deletion-password"
+                    type="password"
+                    value={deletionPassword}
+                    onChange={(event) => setDeletionPassword(event.target.value)}
+                    autoComplete="current-password"
+                    placeholder="Introduce tu contraseña para confirmar"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAccountDeletion}
+                  disabled={!deletionConfirmed || saving}
+                  className="w-full rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto cursor-pointer"
+                >
+                  {saving ? "Iniciando eliminación..." : "Eliminar mi cuenta"}
+                </button>
+              </div>
+            )}
+
+            {(deletionStep === "starting" || deletionStep === "processing") && (
+              <div className="space-y-5">
+                <div>
+                  <div className="flex items-center justify-between text-sm font-medium text-slate-700">
+                    <span>Eliminación progresiva</span>
+                    <span>
+                      {deletionProgress.deletedLinks + deletionProgress.deletedSeparators}
+                      /
+                      {deletionProgress.totalLinks + deletionProgress.totalSeparators}
+                    </span>
+                  </div>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-red-500 transition-all duration-500"
+                      style={{
+                        width: `${
+                          (deletionProgress.deletedLinks + deletionProgress.deletedSeparators)
+                            / Math.max(
+                              deletionProgress.totalLinks + deletionProgress.totalSeparators,
+                              1,
+                            )
+                            * 100
+                        }%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Enlaces</p>
+                    <p className="mt-1 text-xl font-bold text-slate-900">
+                      {deletionProgress.deletedLinks} / {deletionProgress.totalLinks}
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Separadores</p>
+                    <p className="mt-1 text-xl font-bold text-slate-900">
+                      {deletionProgress.deletedSeparators} / {deletionProgress.totalSeparators}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-sm text-slate-500">
+                  Los datos se borran en bloques de 50 elementos para evitar
+                  saturar la API. Tu sesión se conservará mientras termina.
+                </p>
+              </div>
+            )}
+
+            {deletionStep === "failed" && (
+              <div className="space-y-4">
+                <div className="rounded-xl bg-red-50 p-4 text-sm leading-6 text-red-700">
+                  {error}
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={handleCheckDeletionStatus}
+                    disabled={saving}
+                    className="rounded-xl border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50 cursor-pointer"
+                  >
+                    Consultar estado
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeletionStep("idle")}
+                    className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 cursor-pointer"
+                  >
+                    Volver a intentar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </div>

@@ -11,11 +11,21 @@ const { normalizeSpaces, removeAllSpaces, scapeHtml } = require('../utils/saniti
 const { loginLimiter, registerLimiter, forgotPasswordLimiter, resetPasswordLimiter, apiLimiter } = require('../utils/rateLimiters');
 
 const PASSWORD_RESET_TTL_MS = 15 * 60 * 1000;
+const ACCOUNT_DELETION_BATCH_SIZE = 50;
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const hashResetToken = (token) =>
   crypto.createHash('sha256').update(token).digest('hex');
+
+const getAccountDeletionStatus = (job) => ({
+  status: job.status,
+  deletedLinks: Number(job.deleted_links),
+  deletedSeparators: Number(job.deleted_separators),
+  totalLinks: Number(job.total_links),
+  totalSeparators: Number(job.total_separators),
+  errorMessage: job.error_message || null,
+});
 
 // POST /auth/register
 router.post('/register', registerLimiter, async (req, res) => {
@@ -152,6 +162,219 @@ router.put('/profile', apiLimiter, authMiddleware, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 })
+
+// POST /auth/delete-account -- Inicia la eliminación gradual de la cuenta
+router.post('/delete-account', apiLimiter, authMiddleware, async (req, res) => {
+  const { password } = req.body;
+
+  if (typeof password !== 'string' || password.trim().length === 0) {
+    return res.status(400).json({ message: 'La contraseña es obligatoria.' });
+  }
+
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const [userRows] = await connection.query(
+      'SELECT id, password FROM users WHERE id = ? FOR UPDATE',
+      [req.user.id]
+    );
+
+    if (userRows.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+
+    const validPassword = await bcrypt.compare(password, userRows[0].password);
+
+    if (!validPassword) {
+      await connection.rollback();
+      return res.status(400).json({ message: 'La contraseña es incorrecta.' });
+    }
+
+    const [existingJob] = await connection.query(
+      'SELECT status FROM account_deletion_jobs WHERE user_id = ? FOR UPDATE',
+      [req.user.id]
+    );
+
+    if (existingJob.length > 0 && existingJob[0].status !== 'failed') {
+      await connection.rollback();
+      return res.status(409).json({ message: 'Ya existe una eliminación de cuenta en curso.' });
+    }
+
+    const [linkCount] = await connection.query(
+      'SELECT COUNT(*) AS total FROM links WHERE user_id = ?',
+      [req.user.id]
+    );
+    const [separatorCount] = await connection.query(
+      'SELECT COUNT(*) AS total FROM separators WHERE user_id = ?',
+      [req.user.id]
+    );
+
+    await connection.query(
+      `INSERT INTO account_deletion_jobs
+       (user_id, status, total_links, total_separators)
+       VALUES (?, 'processing', ?, ?)
+       ON DUPLICATE KEY UPDATE
+         status = 'processing',
+         error_message = NULL,
+         started_at = CURRENT_TIMESTAMP`,
+      [req.user.id, linkCount[0].total, separatorCount[0].total]
+    );
+
+    const [result] = await connection.query(
+      `SELECT status, deleted_links, deleted_separators, total_links, total_separators, error_message
+       FROM account_deletion_jobs
+       WHERE user_id = ? FOR UPDATE`,
+      [req.user.id]
+    );
+
+    await connection.commit();
+    return res.status(202).json({ message: 'Eliminación de cuenta iniciada.', ...getAccountDeletionStatus(result[0]) });
+  } catch (error) {
+    await connection.rollback();
+    return res.status(500).json({ message: 'No se pudo iniciar la eliminación de cuenta.' });
+  } finally {
+    connection.release();
+  }
+});
+
+// GET /auth/delete-account -- Consulta el progreso de la eliminación
+router.get('/delete-account', apiLimiter, authMiddleware, async (req, res) => {
+  try {
+    const [result] = await db.query(
+      `SELECT status, deleted_links, deleted_separators, total_links, total_separators, error_message
+       FROM account_deletion_jobs
+       WHERE user_id = ?`,
+      [req.user.id]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'No existe una eliminación de cuenta pendiente.' });
+    }
+
+    return res.json(getAccountDeletionStatus(result[0]));
+  } catch (error) {
+    return res.status(500).json({ message: 'No se pudo consultar el progreso de la cuenta.' });
+  }
+});
+
+// PUT /auth/delete-account -- Elimina un lote pequeño y finaliza la cuenta cuando termina
+router.put('/delete-account', apiLimiter, authMiddleware, async (req, res) => {
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const [jobRows] = await connection.query(
+      `SELECT status, deleted_links, deleted_separators, total_links, total_separators
+       FROM account_deletion_jobs
+       WHERE user_id = ? FOR UPDATE`,
+      [req.user.id]
+    );
+
+    if (jobRows.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ message: 'No existe una eliminación de cuenta pendiente.' });
+    }
+
+    const job = jobRows[0];
+
+    if (job.status !== 'processing') {
+      await connection.rollback();
+      return res.status(409).json({ message: 'La eliminación de cuenta no está activa.' });
+    }
+
+    const [links] = await connection.query(
+      `SELECT id FROM links
+       WHERE user_id = ?
+       ORDER BY id ASC
+       LIMIT ${ACCOUNT_DELETION_BATCH_SIZE} FOR UPDATE`,
+      [req.user.id]
+    );
+    const [separators] = await connection.query(
+      `SELECT id FROM separators
+       WHERE user_id = ?
+       ORDER BY id ASC
+       LIMIT ${ACCOUNT_DELETION_BATCH_SIZE} FOR UPDATE`,
+      [req.user.id]
+    );
+
+    if (links.length > 0) {
+      await connection.query(
+        'DELETE FROM links WHERE id IN (?)',
+        [links.map((link) => link.id)]
+      );
+    }
+
+    if (separators.length > 0) {
+      await connection.query(
+        'DELETE FROM separators WHERE id IN (?)',
+        [separators.map((separator) => separator.id)]
+      );
+    }
+
+    const deletedLinks = Number(job.deleted_links) + links.length;
+    const deletedSeparators = Number(job.deleted_separators) + separators.length;
+    const remainingLinks = Number(job.total_links) - deletedLinks;
+    const remainingSeparators = Number(job.total_separators) - deletedSeparators;
+
+    if (remainingLinks < 0 || remainingSeparators < 0) {
+      throw new Error('El progreso de eliminación supera el total de datos.');
+    }
+
+    if (remainingLinks === 0 && remainingSeparators === 0) {
+      await connection.query('DELETE FROM password_resets WHERE user_id = ?', [req.user.id]);
+      await connection.query('DELETE FROM users WHERE id = ?', [req.user.id]);
+      await connection.query('DELETE FROM account_deletion_jobs WHERE user_id = ?', [req.user.id]);
+
+      await connection.commit();
+      return res.status(200).json({
+        status: 'completed',
+        deletedLinks,
+        deletedSeparators,
+        totalLinks: Number(job.total_links),
+        totalSeparators: Number(job.total_separators),
+        message: 'La cuenta y toda su información se eliminaron correctamente.'
+      });
+    }
+
+    await connection.query(
+      `UPDATE account_deletion_jobs
+       SET deleted_links = ?, deleted_separators = ?, status = 'processing'
+       WHERE user_id = ?`,
+      [deletedLinks, deletedSeparators, req.user.id]
+    );
+
+    await connection.commit();
+    return res.status(200).json({
+      status: 'processing',
+      deletedLinks,
+      deletedSeparators,
+      totalLinks: Number(job.total_links),
+      totalSeparators: Number(job.total_separators),
+      message: 'Se eliminaron los datos de la cuenta en bloques pequeños.'
+    });
+  } catch (error) {
+    await connection.rollback();
+
+    try {
+      await db.query(
+        `UPDATE account_deletion_jobs
+         SET status = 'failed', error_message = ?
+         WHERE user_id = ?`,
+        [error.message, req.user.id]
+      );
+    } catch (jobError) {
+      console.error('No se pudo actualizar la tarea de eliminación:', jobError);
+    }
+
+    return res.status(500).json({ message: 'No se pudo eliminar la cuenta. Inténtalo de nuevo.' });
+  } finally {
+    connection.release();
+  }
+});
 
 // PUT /auth/password -- Actualizar la contraseña del usuario
 router.put('/password', apiLimiter, authMiddleware, async (req, res) => {

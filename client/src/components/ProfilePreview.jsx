@@ -10,12 +10,25 @@ export default function ProfilePreview({
     "Aún no tienes bio. Escribe algo que te guste y que te haga sentir bien.";
 
   const avatarInitial = name.charAt(0).toUpperCase();
-  const visibleLinks = links.slice(0, maxLinks);
+  const visibleItems = [];
+  let displayedLinks = 0;
+
+  for (const item of links) {
+    if (item.type === "separator") {
+      visibleItems.push(item);
+      continue;
+    }
+
+    if (displayedLinks < maxLinks) {
+      visibleItems.push(item);
+      displayedLinks += 1;
+    }
+  }
 
   return (
     <section className="relative overflow-hidden rounded-[1.7rem] bg-white shadow-indigo-200/60">
       <div className="absolute left-1/2 top-0 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-slate-900" />
-      <div className="h-24 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500" />
+      <div className="h-24 bg-linear-to-br from-indigo-500 via-violet-500 to-fuchsia-500" />
 
       <div className="-mt-10 px-5 pb-6 text-center">
         {profile?.avatar ? (
@@ -43,19 +56,28 @@ export default function ProfilePreview({
         </p>
 
         <div className="mt-6 space-y-2.5">
-          {visibleLinks.length > 0 ? (
-            visibleLinks.map((link, index) => (
-              <div
-                key={link.id || link.title || index}
-                className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm"
-              >
-                <span className="min-w-0 flex-1 text-center">
-                  {link.title}
-                </span>
+          {visibleItems.length > 0 ? (
+            visibleItems.map((item, index) =>
+              item.type === "separator" ? (
+                <div
+                  key={`preview-separator-${item.id}`}
+                  className="rounded-xl border border-dashed border-violet-300 bg-violet-50 px-4 py-3 text-center text-xs font-semibold tracking-wide text-violet-700"
+                >
+                  {item.name}
+                </div>
+              ) : (
+                <div
+                  key={`preview-link-${item.id || item.title || index}`}
+                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm"
+                >
+                  <span className="min-w-0 flex-1 text-center">
+                    {item.title}
+                  </span>
 
-                <span className="ml-3 text-indigo-500">↗</span>
-              </div>
-            ))
+                  <span className="ml-3 text-indigo-500">↗</span>
+                </div>
+              ),
+            )
           ) : (
             <p className="text-sm text-slate-500 border border-slate-200 bg-white px-4 py-3 text-center rounded-lg">
               Aún no tienes links. Añade tu primer link en el dashboard.

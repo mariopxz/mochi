@@ -151,24 +151,33 @@ export default function Profile() {
             Este perfil todavía no tiene links.
           </p>
         ) : (
-          links.map((link) => (
-            <a
-              key={link.id}
-              href={link.url}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => handleLinkClick(link.id)}
-              className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-indigo-50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <span className="min-w-0 flex-1 text-center">
-                {link.title}
-              </span>
+          links.map((item) =>
+            item.type === "separator" ? (
+              <div
+                key={`profile-separator-${item.id}`}
+                className="rounded-2xl border border-dashed border-violet-300 bg-violet-50 px-5 py-4 text-center text-xs font-bold tracking-[0.18em] text-violet-700 shadow-sm"
+              >
+                {item.name}
+              </div>
+            ) : (
+              <a
+                key={`profile-link-${item.id}`}
+                href={item.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => handleLinkClick(item.id)}
+                className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-indigo-50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <span className="min-w-0 flex-1 text-center">
+                  {item.title}
+                </span>
 
-              <span className="ml-3 text-lg text-indigo-500 transition group-hover:translate-x-1">
-                ↗
-              </span>
-            </a>
-          ))
+                <span className="ml-3 text-lg text-indigo-500 transition group-hover:translate-x-1">
+                  ↗
+                </span>
+              </a>
+            ),
+          )
         )}
       </section>
 
