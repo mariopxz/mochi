@@ -1,7 +1,7 @@
 export default function ProfilePreview({
   profile,
   links = [],
-  maxLinks = 3,
+  maxLinks = null,
 }) {
   const name = profile?.name || profile?.username || "Nombre";
   const username = profile?.username || "username";
@@ -19,7 +19,7 @@ export default function ProfilePreview({
       continue;
     }
 
-    if (displayedLinks < maxLinks) {
+    if (maxLinks === null || displayedLinks < maxLinks) {
       visibleItems.push(item);
       displayedLinks += 1;
     }
