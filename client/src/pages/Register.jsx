@@ -169,6 +169,37 @@ function RegisterContent() {
           </div>
         </div>
 
+        <div className="space-y-3 text-sm text-slate-600">
+          <div className="flex items-start gap-3">
+            <input
+              id="terms-consent"
+              name="termsConsent"
+              type="checkbox"
+              required
+              className="mt-1 size-4 shrink-0 accent-indigo-600"
+            />
+            <label htmlFor="terms-consent">
+              Acepto los{" "}
+              <Link to="/legal#terms" className="font-medium text-indigo-600 hover:underline">
+                Términos de uso
+              </Link>.
+            </label>
+          </div>
+          <p className="pl-7">
+            Consulta también el{" "}
+            <Link to="/legal#legal-notice" className="font-medium text-indigo-600 hover:underline">
+              Aviso legal
+            </Link>, la{" "}
+            <Link to="/legal#privacy" className="font-medium text-indigo-600 hover:underline">
+              Política de privacidad
+            </Link>{" "}
+            y la{" "}
+            <Link to="/legal#cookies" className="font-medium text-indigo-600 hover:underline">
+              Política de cookies
+            </Link>.
+          </p>
+        </div>
+
         <button
           type="submit"
           disabled={loading}

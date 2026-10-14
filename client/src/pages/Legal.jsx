@@ -3,6 +3,7 @@ import PageTitle from "../components/PageTitle";
 
 const sections = [
   {
+    id: "terms",
     title: "Términos de uso",
     content: [
       "Al utilizar Mochi, aceptas que seas responsable de los contenidos que publiques, especialmente de los enlaces, nombres, descripciones y perfiles que compartas con otras personas.",
@@ -11,6 +12,7 @@ const sections = [
     ],
   },
   {
+    id: "privacy",
     title: "Política de privacidad",
     content: [
       "Mochi procesa la información necesaria para gestionar tu cuenta, publicar tu perfil y mostrar los enlaces que hayas configurado.",
@@ -19,14 +21,16 @@ const sections = [
     ],
   },
   {
-    title: "Política de cookies",
+    id: "cookies",
+    title: "Política de cookies y almacenamiento local",
     content: [
-      "La aplicación puede utilizar cookies o sesiones para mantener tu sesión autenticada y recordar tus preferencias mientras utilizas el servicio.",
-      "No se utilizan cookies de terceros para publicidad ni para rastrear tu actividad fuera de Mochi.",
-      "Puedes controlar las cookies desde la configuración de tu navegador. Desactivarlas puede impedir que puedas iniciar sesión o conservar tu sesión.",
+      "En la implementación actual, Mochi no instala cookies de analítica ni publicidad en el navegador.",
+      "Para mantener tu sesión, guardamos en el almacenamiento local del navegador (localStorage) un token de autenticación y tu nombre de usuario. El token tiene una vigencia de siete días. Al cerrar sesión, Mochi elimina ambos valores.",
+      "Puedes borrar estos datos desde la configuración de tu navegador; al hacerlo, tendrás que iniciar sesión de nuevo. Este almacenamiento se utiliza para prestar la función de cuenta y mantener la sesión, no para publicidad ni seguimiento.",
     ],
   },
   {
+    id: "legal-notice",
     title: "Aviso legal",
     content: [
       "Mochi proporciona el servicio tal como está disponible. No ofrecemos garantías sobre la disponibilidad, seguridad o contenido de los enlaces externos.",
@@ -59,6 +63,7 @@ export default function Legal() {
             {sections.map((section) => (
               <section
                 key={section.title}
+                id={section.id}
                 className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
               >
                 <h2 className="text-xl font-bold text-slate-900">
