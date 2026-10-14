@@ -116,7 +116,7 @@ export default function SortableLinkItem({
             </button>
             <button
               type="button"
-              onClick={() => onDelete(link.id)}
+              onClick={() => onDelete({ ...link, type: "link" })}
               className="rounded-lg px-1 py-1.5 text-red-600 md:px-2 md:py-1.5 hover:bg-red-50 hover:cursor-pointer"
             >
               <Trash className="h-4 w-4" />
