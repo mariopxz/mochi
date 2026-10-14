@@ -588,6 +588,7 @@ function DashboardContent() {
                 onChange={handleNewLinkUrlChange}
                 placeholder="https://ejemplo.com"
                 required
+                maxLength={8192}
                 className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>

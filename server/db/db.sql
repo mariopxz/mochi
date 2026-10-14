@@ -16,7 +16,7 @@ CREATE TABLE `links` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `title` varchar(100) NOT NULL,
-  `url` varchar(255) NOT NULL,
+  `url` text NOT NULL,
   `clicks` int DEFAULT '0',
   `position` int DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
