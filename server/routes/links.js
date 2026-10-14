@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/connection');
 const authMiddleware = require('../middleware/auth');
+const MAX_URL_LENGTH = 8192;
 
 // GET /links -- Obtener todos los links y separadores del usuario autenticado
 router.get('/', authMiddleware, async (req, res) => {
@@ -28,6 +29,10 @@ router.get('/', authMiddleware, async (req, res) => {
 // POST /links -- Crear link nuevo
 router.post('/', authMiddleware, async (req, res) => {
   const { title, url } = req.body;
+
+  if (typeof url !== 'string' || url.length > MAX_URL_LENGTH) {
+    return res.status(400).json({ message: 'La URL no puede superar los 8192 caracteres.' });
+  }
 
   try {
     // Verificar si el link ya existe
@@ -106,6 +111,10 @@ router.put('/reorder', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
   const { title, url } = req.body;
   const { id } = req.params;
+
+  if (typeof url !== 'string' || url.length > MAX_URL_LENGTH) {
+    return res.status(400).json({ message: 'La URL no puede superar los 8192 caracteres.' });
+  }
 
   try {
     const [result] = await db.query(

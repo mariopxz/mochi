@@ -58,6 +58,7 @@ export default function SortableLinkItem({
               url: event.target.value
             })}
             required
+            maxLength={8192}
             className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <div className="flex gap-2">
