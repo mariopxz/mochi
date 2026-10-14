@@ -176,9 +176,9 @@ function RegisterContent() {
               name="termsConsent"
               type="checkbox"
               required
-              className="mt-1 size-4 shrink-0 accent-indigo-600"
+              className="mt-0.5 size-4 shrink-0 accent-indigo-600"
             />
-            <label htmlFor="terms-consent">
+            <label htmlFor="terms-consent" className="leading-5">
               Acepto los{" "}
               <Link to="/legal#terms" className="font-medium text-indigo-600 hover:underline">
                 Términos de uso
