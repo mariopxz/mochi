@@ -7,7 +7,8 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  ssl: process.env.DB_CA ? { ca: process.env.DB_CA } : undefined // SSL opcional para Aiven
+  ssl: process.env.DB_CA ? { ca: process.env.DB_CA } : undefined, // SSL opcional para Aiven
+  timezone: 'Z' // Fechas en UTC, igual que Aiven, aunque el servidor corra en otra zona horaria
 });
 
 module.exports = pool.promise();
