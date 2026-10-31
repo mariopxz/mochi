@@ -4,6 +4,7 @@ require('dotenv').config();
 const { apiLimiter } = require('./utils/rateLimiters');
 
 const app = express();
+app.set('trust proxy', 1); // Para que funcione correctamente el rate limiter detrás de un proxy (Render ve a todos los usuarios con la misma IP sin esto)
 
 // Middlewares
 // Restingir las peticiones al dominio configurado en la variable de entorno
