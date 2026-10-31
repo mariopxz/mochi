@@ -33,11 +33,11 @@ router.get('/u/:username', async (req, res) => {
     const user = users[0];
 
     const [links] = await db.query(
-      'SELECT *, "link" AS type FROM links WHERE user_id = ? ORDER BY position ASC',
+      "SELECT *, 'link' AS type FROM links WHERE user_id = ? ORDER BY position ASC",
       [user.id]
     );
     const [separators] = await db.query(
-      'SELECT id, name, position, created_at, "separator" AS type FROM separators WHERE user_id = ? ORDER BY position ASC',
+      "SELECT id, name, position, created_at, 'separator' AS type FROM separators WHERE user_id = ? ORDER BY position ASC",
       [user.id]
     );
     const items = [...links, ...separators]

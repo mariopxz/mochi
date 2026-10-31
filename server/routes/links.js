@@ -9,11 +9,11 @@ const MAX_URL_LENGTH = 8192;
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const [links] = await db.query(
-      'SELECT *, "link" AS type FROM links WHERE user_id = ? ORDER BY position ASC',
+      "SELECT *, 'link' AS type FROM links WHERE user_id = ? ORDER BY position ASC",
       [req.user.id]
     );
     const [separators] = await db.query(
-      'SELECT id, name, position, created_at, "separator" AS type FROM separators WHERE user_id = ? ORDER BY position ASC',
+      "SELECT id, name, position, created_at, 'separator' AS type FROM separators WHERE user_id = ? ORDER BY position ASC",
       [req.user.id]
     );
     const items = [...links, ...separators]
