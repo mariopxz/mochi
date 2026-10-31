@@ -13,7 +13,7 @@ router.get('/', authMiddleware, async (req, res) => {
       [req.user.id]
     );
     const [separators] = await db.query(
-      'SELECT id, name, position, created_at, "separator" AS type FROM separators WHERE user_id = ? ORDER BY position ASC',
+      "SELECT id, name, position, created_at, 'separator' AS type FROM separators WHERE user_id = ? ORDER BY position ASC",
       [req.user.id]
     );
     const items = [...links, ...separators]
